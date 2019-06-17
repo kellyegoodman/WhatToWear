@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2016 The Android Open Source Project
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+          http://www.apache.org/licenses/LICENSE-2.0
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<!-- Layout for the editor -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="@dimen/activity_margin"
+    tools:context=".EditorActivity">
+
+    <!-- Typecategory -->
+    <LinearLayout
+        android:id="@+id/container_subcategory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Label -->
+        <TextView
+            android:text="@string/category_subcategory"
+            style="@style/CategoryStyle" />
+
+        <!-- Input field -->
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:orientation="vertical">
+
+            <!-- Type drop-down spinner -->
+            <Spinner
+                android:id="@+id/spinner_subcategory"
+                android:layout_height="48dp"
+                android:layout_width="wrap_content"
+                android:paddingRight="16dp"
+                android:spinnerMode="dropdown"/>
+
+            <!-- Name field -->
+            <EditText
+                android:id="@+id/edit_item_name"
+                android:hint="@string/hint_item_name"
+                android:inputType="textCapWords"
+                style="@style/EditorFieldStyle" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Image category -->
+    <LinearLayout
+        android:id="@+id/container_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Label -->
+        <TextView
+            android:text="@string/category_image"
+            style="@style/CategoryStyle" />
+
+        <!-- Input fields -->
+        <RelativeLayout
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:paddingLeft="4dp">
+
+            <ImageButton
+                android:id="@+id/edit_item_image"
+                android:theme="@style/AppTheme"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scaleType="fitXY"
+                android:maxHeight="160dp"
+                android:adjustViewBounds="true"
+                android:src="@drawable/baseline_add_photo_alternate_black_36dp"/>
+
+        </RelativeLayout>
+    </LinearLayout>
+
+
+    <!-- Weight category -->
+    <LinearLayout
+        android:id="@+id/container_weight"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Label -->
+        <TextView
+            android:text="@string/category_weight"
+            style="@style/CategoryStyle" />
+
+        <!-- Input fields -->
+        <RelativeLayout
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:paddingLeft="4dp">
+
+            <!-- Weight field -->
+            <EditText
+                android:id="@+id/edit_item_weight"
+                android:hint="@string/hint_item_weight"
+                android:inputType="number"
+                style="@style/EditorFieldStyle" />
+
+            <!-- Units for weight (g) -->
+            <TextView
+                android:id="@+id/label_weight_units"
+                android:text="@string/unit_item_weight"
+                style="@style/EditorUnitsStyle"/>
+        </RelativeLayout>
+    </LinearLayout>
+
+    <!-- Fabric category -->
+    <LinearLayout
+        android:id="@+id/container_fabric"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Label -->
+        <TextView
+            android:text="@string/category_fabrics"
+            style="@style/CategoryStyle" />
+
+        <!-- Input field -->
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:orientation="vertical">
+
+            <!-- Cotton field -->
+            <RelativeLayout
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_weight="2"
+                android:paddingLeft="4dp">
+
+                <!-- Cotton value field -->
+                <EditText
+                    android:id="@+id/edit_item_cotton"
+                    android:hint="@string/hint_item_cotton"
+                    android:inputType="number"
+                    style="@style/EditorFieldStyle" />
+
+                <!-- Units for fabric percentage (%) -->
+                <TextView
+                    android:text="@string/unit_item_cotton"
+                    style="@style/EditorUnitsStyle"/>
+            </RelativeLayout>
+
+            <!-- Polyester field -->
+            <RelativeLayout
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_weight="2"
+                android:paddingLeft="4dp">
+
+                <!-- Polyester value field -->
+                <EditText
+                    android:id="@+id/edit_item_polyester"
+                    android:hint="@string/hint_item_polyester"
+                    android:inputType="number"
+                    style="@style/EditorFieldStyle" />
+
+                <!-- Units for fabric percentage (%) -->
+                <TextView
+                    android:text="@string/unit_item_polyester"
+                    style="@style/EditorUnitsStyle"/>
+            </RelativeLayout>
+
+            <!-- Rayon field -->
+            <RelativeLayout
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_weight="2"
+                android:paddingLeft="4dp">
+
+                <!-- Rayon value field -->
+                <EditText
+                    android:id="@+id/edit_item_rayon"
+                    android:hint="@string/hint_item_rayon"
+                    android:inputType="number"
+                    style="@style/EditorFieldStyle" />
+
+                <!-- Units for fabric percentage (%) -->
+                <TextView
+                    android:text="@string/unit_item_rayon"
+                    style="@style/EditorUnitsStyle"/>
+            </RelativeLayout>
+
+            <!-- Nylon field -->
+            <RelativeLayout
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_weight="2"
+                android:paddingLeft="4dp">
+
+                <!-- Nylon value field -->
+                <EditText
+                    android:id="@+id/edit_item_nylon"
+                    android:hint="@string/hint_item_nylon"
+                    android:inputType="number"
+                    style="@style/EditorFieldStyle" />
+
+                <!-- Units for fabric percentage (%) -->
+                <TextView
+                    android:text="@string/unit_item_nylon"
+                    style="@style/EditorUnitsStyle"/>
+            </RelativeLayout>
+
+            <!-- Spandex field -->
+            <RelativeLayout
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_weight="2"
+                android:paddingLeft="4dp">
+
+                <!-- Spandex value field -->
+                <EditText
+                    android:id="@+id/edit_item_spandex"
+                    android:hint="@string/hint_item_spandex"
+                    android:inputType="number"
+                    style="@style/EditorFieldStyle" />
+
+                <!-- Units for fabric percentage (%) -->
+                <TextView
+                    android:text="@string/unit_item_spandex"
+                    style="@style/EditorUnitsStyle"/>
+            </RelativeLayout>
+
+            <!-- Wool field -->
+            <RelativeLayout
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_weight="2"
+                android:paddingLeft="4dp">
+
+                <!-- Wool value field -->
+                <EditText
+                    android:id="@+id/edit_item_wool"
+                    android:hint="@string/hint_item_wool"
+                    android:inputType="number"
+                    style="@style/EditorFieldStyle" />
+
+                <!-- Units for fabric percentage (%) -->
+                <TextView
+                    android:text="@string/unit_item_wool"
+                    style="@style/EditorUnitsStyle"/>
+            </RelativeLayout>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

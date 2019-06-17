@@ -1,0 +1,204 @@
+<resources>
+    <string name="app_name">WhatToWear</string>
+
+    <string name="outfit_title">Outfit Recommendations</string>
+
+    <string name="weather_summary_title">Today\'s Weather</string>
+
+    <string name="page_outfit_recommendations">Outfits</string>
+
+    <string name="page_weather">Weather</string>
+
+    <string name="page_catalog">Wardrobe</string>
+
+    <!-- Text to display in the list when there is no hourly forecast data [CHAR LIMIT=NONE] -->
+    <string name="no_weather_data">Cannot get hourly forecast.</string>
+
+    <!-- Text to display in the list when there is no hourly forecast data [CHAR LIMIT=NONE] -->
+    <string name="no_daily_weather_data">Cannot get today\'s forecast.</string>
+
+    <!-- Error message when there is no internet connectivity [CHAR LIMIT=NONE] -->
+    <string name="no_internet_connection">No internet connection.</string>
+
+    <!-- Title text for the empty view, which describes the empty wardrobe image [CHAR LIMIT=50] -->
+    <string name="empty_catalog_title_text">It\'s a bit lonely here...</string>
+
+    <!-- Title text for the empty view, which describes the empty wardrobe image [CHAR LIMIT=50] -->
+    <string name="empty_outfit_title_text">You don\'t have any clothes!</string>
+
+    <!-- Subtitle text for the empty view that prompts the user to add a clothing item [CHAR LIMIT=50] -->
+    <string name="empty_view_subtitle_text">Get started by adding some clothes</string>
+
+    <!-- Label for overflow menu option that launches intent to edit settings in the app [CHAR LIMIT=20] -->
+    <string name="action_edit_settings">Settings</string>
+
+    <!-- Label for overflow menu option that inserts fake clothing data into the app [CHAR LIMIT=20] -->
+    <string name="action_insert_dummy_data">Insert Dummy Data</string>
+
+    <!-- Label for overflow menu option that deletes all clothing data in the app [CHAR LIMIT=20] -->
+    <string name="action_delete_all_entries">Delete All Clothes</string>
+
+    <!-- Settings Menu Item [CHAR LIMIT=NONE] -->
+    <string name="settings_menu_item">Settings</string>
+    <!-- Settings Activity Title [CHAR LIMIT=NONE] -->
+    <string name="settings_title">Forecast Settings</string>
+
+    <!-- Strings For Temperature Units Preference [CHAR LIMIT=30] -->
+    <string name="settings_city_label">Location</string>
+    <string name="settings_city_key" translatable="false">city</string>
+    <string name="settings_city_default" translatable="false">Boulder,CO</string>
+
+    <!-- Strings For Order-By Preference [CHAR LIMIT=30] -->
+    <string name="settings_units_label">Temperature Units</string>
+    <string name="settings_units_key" translatable="false">temp_units</string>
+    <string name="settings_units_default" translatable="false">@string/settings_units_Farenheit_value</string>
+
+    <!-- Label for order-by magnitude option [CHAR LIMIT=20] -->
+    <string name="settings_units_Farenheit_label">Farenheit</string>
+    <string name="settings_units_Farenheit_value" translatable="false">F</string>
+
+    <!-- Label for order-by most recent option [CHAR LIMIT=20] -->
+    <string name="settings_units_Celsius_label">Celsius</string>
+    <string name="settings_units_Celsius_value" translatable="false">C</string>
+
+    <!-- Title for the activity to add a new pet [CHAR LIMIT=20] -->
+    <string name="editor_activity_title_new_item">Add an Item</string>
+
+    <!-- Title for the activity to edit pet [CHAR LIMIT=20] -->
+    <string name="editor_activity_title_edit_item">Edit Item</string>
+
+    <!-- Label for editor menu option to save pet and leave editor [CHAR LIMIT=20] -->
+    <string name="action_save">Save</string>
+
+    <!-- Label for editor overflow menu option that deletes the current pet [CHAR LIMIT=20] -->
+    <string name="action_delete">Delete</string>
+
+    <!-- Label for overview category of attributes in the editor [CHAR LIMIT=30] -->
+    <string name="category_image">Image File</string>
+
+    <!-- Label for gender information in the editor [CHAR LIMIT=30] -->
+    <string name="category_subcategory">Type</string>
+
+    <!-- Label for gender information in the editor [CHAR LIMIT=30] -->
+    <string name="category_fabrics">Fabric</string>
+
+    <!-- Label for measurement information in the editor [CHAR LIMIT=30] -->
+    <string name="category_weight">Weight</string>
+
+    <!-- Text hint for name field in the editor [CHAR LIMIT=30] -->
+    <string name="hint_item_name">Name</string>
+
+    <!-- Text hint for name field in the editor [CHAR LIMIT=30] -->
+    <string name="hint_item_image">Add a Picture</string>
+
+    <!-- Text hint for name field in the editor [CHAR LIMIT=30] -->
+    <string name="hint_item_weight">Weight</string>
+
+    <!-- Units for weight of the pet (grams) [CHAR LIMIT=5] -->
+    <string name="unit_item_weight">g</string>
+
+    <!-- Text hint for name field in the editor [CHAR LIMIT=30] -->
+    <string name="hint_item_cotton">Cotton</string>
+
+    <!-- Text hint for name field in the editor [CHAR LIMIT=30] -->
+    <string name="hint_item_polyester">Polyester</string>
+
+    <!-- Text hint for name field in the editor [CHAR LIMIT=30] -->
+    <string name="hint_item_rayon">Rayon</string>
+
+    <!-- Text hint for name field in the editor [CHAR LIMIT=30] -->
+    <string name="hint_item_nylon">Nylon</string>
+
+    <!-- Text hint for name field in the editor [CHAR LIMIT=30] -->
+    <string name="hint_item_spandex">Spandex</string>
+
+    <!-- Text hint for name field in the editor [CHAR LIMIT=30] -->
+    <string name="hint_item_wool">Wool</string>
+
+    <!-- Units for weight of the pet (grams) [CHAR LIMIT=5] -->
+    <string name="unit_item_fabric">%</string>
+
+    <!-- Units for weight of the pet (grams) [CHAR LIMIT=5] -->
+    <string name="unit_item_cotton">% Cotton</string>
+    <!-- Units for weight of the pet (grams) [CHAR LIMIT=5] -->
+    <string name="unit_item_polyester">% Polyester</string>
+    <!-- Units for weight of the pet (grams) [CHAR LIMIT=5] -->
+    <string name="unit_item_rayon">% Rayon</string>
+    <!-- Units for weight of the pet (grams) [CHAR LIMIT=5] -->
+    <string name="unit_item_nylon">% Nylon</string>
+    <!-- Units for weight of the pet (grams) [CHAR LIMIT=5] -->
+    <string name="unit_item_spandex">% Spandex</string>
+    <!-- Units for weight of the pet (grams) [CHAR LIMIT=5] -->
+    <string name="unit_item_wool">% Wool</string>
+
+    <!-- Text for when there is no name [CHAR LIMIT=5] -->
+    <string name="no_item_name"></string>
+
+    <!-- Label for dropdown menu option if the pet's gender is unknown [CHAR LIMIT=20] -->
+    <string name="subcategory_tshirt">T Shirt</string>
+    <!-- Label for dropdown menu option if the pet's gender is unknown [CHAR LIMIT=20] -->
+    <string name="subcategory_longsleeve">Longsleeve Shirt</string>
+    <!-- Label for dropdown menu option if the pet's gender is unknown [CHAR LIMIT=20] -->
+    <string name="subcategory_blouse">Blouse</string>
+    <!-- Label for dropdown menu option if the pet's gender is unknown [CHAR LIMIT=20] -->
+    <string name="subcategory_casual_pants">Casual Pants</string>
+    <!-- Label for dropdown menu option if the pet's gender is unknown [CHAR LIMIT=20] -->
+    <string name="subcategory_shorts">Shorts</string>
+    <!-- Label for dropdown menu option if the pet's gender is unknown [CHAR LIMIT=20] -->
+    <string name="subcategory_slacks">Slacks</string>
+    <!-- Label for dropdown menu option if the pet's gender is unknown [CHAR LIMIT=20] -->
+    <string name="subcategory_skirt">Skirt</string>
+    <!-- Label for dropdown menu option if the pet's gender is unknown [CHAR LIMIT=20] -->
+    <string name="subcategory_casual_dress">Casual Dress</string>
+    <!-- Label for dropdown menu option if the pet's gender is unknown [CHAR LIMIT=20] -->
+    <string name="subcategory_formal_dress">Fancy Dress</string>
+    <!-- Label for dropdown menu option if the pet's gender is unknown [CHAR LIMIT=20] -->
+    <string name="subcategory_sweater">Sweater</string>
+    <!-- Label for dropdown menu option if the pet's gender is unknown [CHAR LIMIT=20] -->
+    <string name="subcategory_hoodie">Hoodie</string>
+    <!-- Label for dropdown menu option if the pet's gender is unknown [CHAR LIMIT=20] -->
+    <string name="subcategory_cardigan">Cardigan</string>
+    <!-- Label for dropdown menu option if the pet's gender is unknown [CHAR LIMIT=20] -->
+    <string name="subcategory_jacket">Jacket</string>
+    <!-- Label for dropdown menu option if the pet's gender is unknown [CHAR LIMIT=20] -->
+    <string name="subcategory_coat">Coat</string>
+
+    <!-- Toast message in editor when new pet has been successfully inserted [CHAR LIMIT=NONE] -->
+    <string name="editor_insert_item_successful">Item saved</string>
+
+    <!-- Toast message in editor when new pet has failed to be inserted [CHAR LIMIT=NONE] -->
+    <string name="editor_insert_item_failed">Error with saving item</string>
+
+    <!-- Toast message in editor when current pet was successfully updated [CHAR LIMIT=NONE] -->
+    <string name="editor_update_item_successful">Item updated</string>
+
+    <!-- Toast message in editor when current pet has failed to be updated [CHAR LIMIT=NONE] -->
+    <string name="editor_update_item_failed">Error with updating item</string>
+
+    <!-- Dialog message when user is leaving editor but hasn't saved changes [CHAR LIMIT=NONE] -->
+    <string name="unsaved_changes_dialog_msg">Discard your changes and quit editing?</string>
+
+    <!-- Dialog button text for the option to discard a user's changes [CHAR LIMIT=20] -->
+    <string name="discard">Discard</string>
+
+    <!-- Dialog button text for the option to keep editing the current pet [CHAR LIMIT=20] -->
+    <string name="keep_editing">Keep Editing</string>
+
+    <!-- Dialog button text for the option to delete a pet [CHAR LIMIT=20] -->
+    <string name="delete">Delete</string>
+
+    <!-- Dialog button text for the option to cancel a delete [CHAR LIMIT=20] -->
+    <string name="cancel">Cancel</string>
+
+    <!-- Dialog message to confirm delete of pet [CHAR LIMIT=20] -->
+    <string name="delete_dialog_msg">Delete Item?</string>
+
+    <!-- Toast message in editor when new pet has failed to be deleted [CHAR LIMIT=NONE] -->
+    <string name="editor_delete_item_failed">Error with deleting item</string>
+
+    <!-- Toast message in editor when current pet was successfully deleted [CHAR LIMIT=NONE] -->
+    <string name="editor_delete_item_successful">Item deleted</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
