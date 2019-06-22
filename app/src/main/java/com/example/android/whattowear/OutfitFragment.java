@@ -26,11 +26,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -70,7 +67,7 @@ public class OutfitFragment extends Fragment
 
 
 
-        // Find a reference to the {@link ListView} in the layout
+        // Find a reference to the daily_weather_display view in the layout
         LinearLayout dailyWeatherView = (LinearLayout) rootView.findViewById(R.id.daily_weather_display);
 
         // Set empty view for the case there is no data to display
@@ -159,8 +156,7 @@ public class OutfitFragment extends Fragment
      * This method runs on the main UI thread after the background work has been
      * completed. This method receives as input, the return value from the doInBackground()
      * method. First we clear out the adapter, to get rid of weather data from a previous
-     * query to USGS. Then we update the adapter with the new list of hourly weathers,
-     * which will trigger the ListView to re-populate its list items.
+     * query. Then we update the adapter with the new daily weather.
      */
     @Override
     public void onLoadFinished(@NonNull Loader<WeatherDay> loader, WeatherDay weather) {
@@ -174,8 +170,7 @@ public class OutfitFragment extends Fragment
         // Clear the adapter of previous weather data
         //clearWeather();
 
-        // If there is a valid {@link WeatherDy}, then add them to the adapter's
-        // data set. This will trigger the ListView to update.
+        // If there is a valid {@link WeatherDay}, then update the display.
         if (weather != null) {
             mEmptyStateTextView.setVisibility(View.GONE);
             formatWeather(weather);
@@ -209,17 +204,17 @@ public class OutfitFragment extends Fragment
                     getContext().getPackageName());
             iconView.setImageDrawable(getResources().getDrawable(id));
 
-            // Populate the max temp TextView with the max temp
+            // Populate the high daily temperature TextView
             TextView maxTemperatureTextView = (TextView) weatherView.findViewById(R.id.high_temperature);
             String formattedTemp = formatTemperature(weather_data.getHighTemperature());
             maxTemperatureTextView.setText(formattedTemp + " " + mTemperatureUnits);
 
-            // Populate the min temp TextView with the min temp
+            // Populate the low daily temperature TextView
             TextView minTemperatureTextView = (TextView) weatherView.findViewById(R.id.low_temperature);
             formattedTemp = formatTemperature(weather_data.getLowTemperature());
             minTemperatureTextView.setText(formattedTemp + " " + mTemperatureUnits);
 
-            // Find the TextView in the list_item.xml layout with the ID location_qualifier
+            // Populate the weather description TextView
             TextView descriptionTextView = (TextView) weatherView.findViewById(R.id.dailyWeatherDescription);
             descriptionTextView.setText(weather_data.getWeatherDescription());
         }
