@@ -23,7 +23,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_centerInParent="true">
+            android:layout_centerInParent="true"
+            android:layout_alignParentTop="true">
 
             <TextView
                 android:id="@+id/empty_outfit_title_text"
@@ -52,16 +53,18 @@
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true">
+            android:layout_centerInParent="true"
+            android:layout_alignParentTop="true">
 
             <!-- Dress view -->
             <ImageView
                 android:id="@+id/dress_view"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="300dp"
                 android:scaleType="fitXY"
-                android:maxHeight="300dp"
-                android:layout_gravity="center"/>
+                android:layout_gravity="center"
+                android:layout_centerInParent="true"
+                android:layout_alignParentTop="true"/>
 
             <!-- Top, bottom view -->
             <LinearLayout
@@ -72,11 +75,18 @@
                 <ImageView
                     android:id="@+id/outfit_top_view"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:scaleType="fitXY"
-                    android:maxHeight="150dp"
+                    android:maxHeight="100dp"
                     android:layout_gravity="center"/>
 
+                <ImageView
+                    android:id="@+id/outfit_bottom_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:scaleType="fitXY"
+                    android:maxHeight="100dp"
+                    android:layout_gravity="center"/>
 
             </LinearLayout>
 
