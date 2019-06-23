@@ -64,7 +64,7 @@ public class CatalogFragment extends Fragment
         ListView petListView = (ListView) rootView.findViewById(R.id.list);
 
         // Find and set empty view on the ListView, so that it only shows when the list has 0 items.
-        View emptyView = rootView.findViewById(R.id.empty_view);
+        View emptyView = rootView.findViewById(R.id.wardrobe_empty_view);
         petListView.setEmptyView(emptyView);
 
         // Set up an adapter to create a list item for each row of pet data in the cursor.

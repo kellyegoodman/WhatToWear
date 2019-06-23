@@ -38,7 +38,7 @@ public class WeatherFragment extends Fragment
      * Constant value for the weather loader ID. We can choose any integer.
      * This really only comes into play if you're using multiple loaders.
      */
-    private static final int WEATHER_LOADER_ID = 1;
+    private static final int HOURLY_WEATHER_LOADER_ID = 1;
 
     /** Adapter for the list of hourly forecasts */
     private WeatherHourAdapter mAdapter;
@@ -94,7 +94,7 @@ public class WeatherFragment extends Fragment
             // Initialize the loader. Pass in the int ID constant defined above and pass in null for
             // the bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
             // because this activity implements the LoaderCallbacks interface).
-            loaderManager.initLoader(WEATHER_LOADER_ID, null, this);
+            loaderManager.initLoader(HOURLY_WEATHER_LOADER_ID, null, this);
         } else {
             // Otherwise, display error
             // First, hide loading indicator so error message will be visible
