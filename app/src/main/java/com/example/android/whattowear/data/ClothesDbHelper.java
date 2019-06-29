@@ -52,7 +52,8 @@ public class ClothesDbHelper extends SQLiteOpenHelper {
                 + ClothesEntry.COLUMN_ARTICLE_RAYON + " INTEGER NOT NULL DEFAULT 0, "
                 + ClothesEntry.COLUMN_ARTICLE_NYLON + " INTEGER NOT NULL DEFAULT 0, "
                 + ClothesEntry.COLUMN_ARTICLE_SPANDEX + " INTEGER NOT NULL DEFAULT 0, "
-                + ClothesEntry.COLUMN_ARTICLE_WOOL + " INTEGER NOT NULL DEFAULT 0);";
+                + ClothesEntry.COLUMN_ARTICLE_WOOL + " INTEGER NOT NULL DEFAULT 0, "
+                + ClothesEntry.COLUMN_ARTICLE_WARMTH + " REAL NOT NULL DEFAULT 0);";
 
         // Execute the SQL statement
         db.execSQL(SQL_CREATE_CLOTHES_TABLE);

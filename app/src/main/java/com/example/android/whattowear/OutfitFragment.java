@@ -44,6 +44,19 @@ public class OutfitFragment extends Fragment {
 
     public static final String LOG_TAG = MainActivity.class.getName();
 
+    private int mTasksLeft;
+
+    public void onAllTasksCompleted() {
+        // launch outfit logic
+    }
+
+    public void taskComplete() {
+        mTasksLeft--;
+        if (mTasksLeft==0) {
+            onAllTasksCompleted();
+        }
+    }
+
     /**
      * Constant value for the weather loader ID. We can choose any integer.
      * This really only comes into play if you're using multiple loaders.
@@ -55,6 +68,11 @@ public class OutfitFragment extends Fragment {
     private TextView mEmptyStateTextView;
 
     private String mTemperatureUnits;
+
+    private double mOptimalOutfitWarmth;
+
+    private double mScaleCtoWarmth = 1;
+    private double mScaleFtoWarmth = 1;
 
     // TODO: put loadercallback implementations in separate files
     private LoaderManager.LoaderCallbacks<WeatherDay> weatherLoaderListener
@@ -104,11 +122,20 @@ public class OutfitFragment extends Fragment {
 
             // If there is a valid {@link WeatherDay}, then update the display.
             if (weather != null) {
+                // set the desired warmth factor
+                if (mTemperatureUnits == getString(R.string.settings_units_Celsius_value)) {
+                    mOptimalOutfitWarmth = mScaleCtoWarmth * weather.getHighTemperature();
+                } else if (mTemperatureUnits == getString(R.string.settings_units_Farenheit_value)) {
+                    mOptimalOutfitWarmth = mScaleFtoWarmth * weather.getHighTemperature();
+                }
+
                 mEmptyStateTextView.setVisibility(View.GONE);
                 formatWeather(weather);
             }
 
             Log.v(LOG_TAG, "onLoadFinished");
+
+            taskComplete();
         }
 
         @Override
@@ -165,6 +192,8 @@ public class OutfitFragment extends Fragment {
     private LoaderManager.LoaderCallbacks<Cursor> outfitLoaderListener
             = new LoaderManager.LoaderCallbacks<Cursor>() {
 
+        private OutfitLogic mOutfitLogic = new OutfitLogic();
+
         @NonNull
         @Override
         public Loader<Cursor> onCreateLoader(int i, @Nullable Bundle bundle) {
@@ -204,6 +233,8 @@ public class OutfitFragment extends Fragment {
             }
 
             Log.v(LOG_TAG, "onLoadFinished");
+
+            taskComplete();
         }
 
         @Override
@@ -222,6 +253,8 @@ public class OutfitFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.activity_outfits, container, false);
+
+        mTasksLeft = 2;
 
         // populate options menu
         setHasOptionsMenu(true);

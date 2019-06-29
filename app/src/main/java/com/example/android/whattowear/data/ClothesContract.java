@@ -1,6 +1,7 @@
 package com.example.android.whattowear.data;
 
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
@@ -121,6 +122,13 @@ public final class ClothesContract {
         public final static String COLUMN_ARTICLE_WOOL = "wool";
 
         /**
+         * Computed warmth factor of the item.
+         *
+         * Type: REAL
+         */
+        public final static String COLUMN_ARTICLE_WARMTH = "warmth";
+
+        /**
          * Enum of materials
          */
         public static final int COTTON = 0;
@@ -174,6 +182,7 @@ public final class ClothesContract {
         public static final int SUBCATEGORY_CARDIGAN = 11;
         public static final int SUBCATEGORY_JACKET = 12;
         public static final int SUBCATEGORY_COAT = 13;
+        public static final int NUM_SUBCATEGORIES = 14;
 
         public static String getSubCategoryName(int subcategory_id) {
             switch (subcategory_id) {
@@ -238,6 +247,39 @@ public final class ClothesContract {
          */
         private static final double[] densities = {1.5, 1.38, 1.49, 1.15, 1.32, 1.29};
         private static final double[] thermalConductivity = {0.04, 0.05, 0.1, 0.25, 0.2, 0.39};
+
+        // warmth factor derivation
+        // density = pi*%i
+        // volume = weight / density
+        // warmth factor = V * ( ki*%i )
+
+        public static double getWarmthFactor(ContentValues values) {
+            // get materials and weight
+            Integer cotton = values.getAsInteger(ClothesEntry.COLUMN_ARTICLE_COTTON);
+            Integer polyester = values.getAsInteger(ClothesEntry.COLUMN_ARTICLE_POLYESTER);
+            Integer rayon = values.getAsInteger(ClothesEntry.COLUMN_ARTICLE_RAYON);
+            Integer nylon = values.getAsInteger(ClothesEntry.COLUMN_ARTICLE_NYLON);
+            Integer spandex = values.getAsInteger(ClothesEntry.COLUMN_ARTICLE_SPANDEX);
+            Integer wool = values.getAsInteger(ClothesEntry.COLUMN_ARTICLE_WOOL);
+
+            double density = (cotton*densities[0] +
+                    polyester*densities[1] +
+                    rayon*densities[2] +
+                    nylon*densities[3] +
+                    spandex*densities[4] +
+                    wool*densities[5]) / 100;
+
+            Integer weight = values.getAsInteger(ClothesEntry.COLUMN_ARTICLE_WEIGHT);
+
+            double warmth = weight * (cotton*thermalConductivity[0] +
+                    polyester*thermalConductivity[1] +
+                    rayon*thermalConductivity[2] +
+                    nylon*thermalConductivity[3] +
+                    spandex*thermalConductivity[4] +
+                    wool*thermalConductivity[5]) / density;
+            return warmth;
+        }
+
 
         /**
          * Returns the density of the given material

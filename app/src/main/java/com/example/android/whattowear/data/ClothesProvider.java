@@ -141,6 +141,10 @@ public class ClothesProvider extends ContentProvider {
             throw new IllegalArgumentException("Item requires valid weight");
         }
 
+        // compute the warmth
+        double warmth = ClothesEntry.getWarmthFactor(values);
+        values.put(ClothesEntry.COLUMN_ARTICLE_WARMTH, warmth);
+
         // No need to check the name or image file name, any value is valid (including null).
         // TODO: check that image path is valid?
 
@@ -227,6 +231,10 @@ public class ClothesProvider extends ContentProvider {
                 throw new IllegalArgumentException("Pet requires valid weight");
             }
         }
+
+        // compute the warmth
+        double warmth = ClothesEntry.getWarmthFactor(values);
+        values.put(ClothesEntry.COLUMN_ARTICLE_WARMTH, warmth);
 
         // No need to check the image file name, any value is valid (including null).
 
