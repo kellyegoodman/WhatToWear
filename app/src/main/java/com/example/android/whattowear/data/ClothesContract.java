@@ -246,7 +246,7 @@ public final class ClothesContract {
          * Material properties
          */
         private static final double[] densities = {1.5, 1.38, 1.49, 1.15, 1.32, 1.29};
-        private static final double[] thermalConductivity = {0.04, 0.05, 0.1, 0.25, 0.2, 0.39};
+        private static final double[] thermalConductivity = {0.04, 0.05, 0.06, 0.15, 0.08, 0.20};
 
         // warmth factor derivation
         // density = pi*%i

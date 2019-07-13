@@ -35,6 +35,7 @@ import android.widget.TextView;
 
 import java.text.DecimalFormat;
 import com.example.android.whattowear.data.ClothesContract.ClothesEntry;
+import com.example.android.whattowear.data.ClothesProvider;
 
 
 /**
@@ -44,25 +45,13 @@ public class OutfitFragment extends Fragment {
 
     public static final String LOG_TAG = MainActivity.class.getName();
 
-    private int mTasksLeft;
-
-    public void onAllTasksCompleted() {
-        // launch outfit logic
-    }
-
-    public void taskComplete() {
-        mTasksLeft--;
-        if (mTasksLeft==0) {
-            onAllTasksCompleted();
-        }
-    }
+    private ClothesProvider mClothesProvider =  new ClothesProvider();
 
     /**
      * Constant value for the weather loader ID. We can choose any integer.
      * This really only comes into play if you're using multiple loaders.
      */
     private static final int WEATHER_LOADER_ID = 2;
-    private static final int CLOTHES_LOADER_ID = 3;
 
     /** TextView that is displayed when weather data is unavailable */
     private TextView mEmptyStateTextView;
@@ -74,7 +63,10 @@ public class OutfitFragment extends Fragment {
     private double mScaleCtoWarmth = 1;
     private double mScaleFtoWarmth = 1;
 
-    // TODO: put loadercallback implementations in separate files
+    private OutfitLogic m_casualOutfitLogic;
+    private OutfitLogic m_formalOutfitLogic;
+
+    // Weather Data callback
     private LoaderManager.LoaderCallbacks<WeatherDay> weatherLoaderListener
             = new LoaderManager.LoaderCallbacks<WeatherDay>() {
         @Override
@@ -129,13 +121,15 @@ public class OutfitFragment extends Fragment {
                     mOptimalOutfitWarmth = mScaleFtoWarmth * weather.getHighTemperature();
                 }
 
+                // call on outfit logic to display outfits
+                m_casualOutfitLogic.FetchOutfit(mOptimalOutfitWarmth);
+                m_formalOutfitLogic.FetchOutfit(mOptimalOutfitWarmth);
+
                 mEmptyStateTextView.setVisibility(View.GONE);
                 formatWeather(weather);
             }
 
             Log.v(LOG_TAG, "onLoadFinished");
-
-            taskComplete();
         }
 
         @Override
@@ -189,72 +183,14 @@ public class OutfitFragment extends Fragment {
         }
     };
 
-    private LoaderManager.LoaderCallbacks<Cursor> outfitLoaderListener
-            = new LoaderManager.LoaderCallbacks<Cursor>() {
-
-        private OutfitLogic mOutfitLogic = new OutfitLogic();
-
-        @NonNull
-        @Override
-        public Loader<Cursor> onCreateLoader(int i, @Nullable Bundle bundle) {
-            // Define a projection that specifies which table columns we care about.
-            String[] projection = {
-                    ClothesEntry._ID,
-                    ClothesEntry.COLUMN_ARTICLE_SUBCATEGORY,
-                    ClothesEntry.COLUMN_ARTICLE_NAME,
-                    ClothesEntry.COLUMN_ARTICLE_IMAGE};
-
-            // This loader will execute the ContentProvider's query method on a background thread
-            return new CursorLoader(getActivity(),    // Parent activity's context
-                    ClothesEntry.CONTENT_URI,       // Provider content URI to query
-                    projection,                     // Columns to include in the resulting cursor
-                    null,                   // No selection clause
-                    null,                // No selection arguments
-                    null);                 // Default sort order
-        }
-
-        @Override
-        public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
-            // TODO: this is to load and display a dummy image (no logic)
-            // Show dress view
-            ImageView dressView = (ImageView) getView().findViewById(R.id.dress_view);
-            View emptyView = getView().findViewById(R.id.empty_outfit_view);
-
-            // get the image
-            String picturePath = null;
-            if (cursor.moveToFirst()) {
-                picturePath = cursor.getString(cursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE));
-            }
-
-            if (!TextUtils.isEmpty(picturePath)) {
-                dressView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
-                dressView.setVisibility(View.VISIBLE);
-                emptyView.setVisibility(View.GONE);
-            }
-
-            Log.v(LOG_TAG, "onLoadFinished");
-
-            taskComplete();
-        }
-
-        @Override
-        public void onLoaderReset(@NonNull Loader<Cursor> loader) {
-            // Callback called when data needs to be deleted
-            Log.v(LOG_TAG, "onLoaderReset");
-        }
-    };
-
     public OutfitFragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.activity_outfits, container, false);
-
-        mTasksLeft = 2;
 
         // populate options menu
         setHasOptionsMenu(true);
@@ -263,8 +199,8 @@ public class OutfitFragment extends Fragment {
         View emptyView = rootView.findViewById(R.id.empty_outfit_view);
         emptyView.setVisibility(View.VISIBLE);
 
-        getLoaderManager().initLoader(CLOTHES_LOADER_ID, null, outfitLoaderListener);
-
+        m_casualOutfitLogic = new OutfitLogic(getContext(), getLoaderManager(), OutfitLogic.CASUAL_TAG);
+        m_formalOutfitLogic = new OutfitLogic(getContext(), getLoaderManager(), OutfitLogic.FORMAL_TAG);
 
         // Find a reference to the daily_weather_display view in the layout
         LinearLayout dailyWeatherView = (LinearLayout) rootView.findViewById(R.id.daily_weather_display);
@@ -325,12 +261,5 @@ public class OutfitFragment extends Fragment {
         }
         return super.onOptionsItemSelected(item);
     }
-
-
-
-
-
-
-
 
 }

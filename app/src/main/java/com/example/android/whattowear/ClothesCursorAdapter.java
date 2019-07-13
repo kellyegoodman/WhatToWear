@@ -63,11 +63,13 @@ public class ClothesCursorAdapter extends CursorAdapter {
         // get the text views to populate
         TextView subcategoryTextView = (TextView) view.findViewById(R.id.subcategory);
         TextView nameTextView = (TextView) view.findViewById(R.id.name);
+        TextView warmthView = (TextView) view.findViewById(R.id.warmth);
         ImageView imageView = (ImageView) view.findViewById(R.id.item_image);
 
         // get the data from the cursor
         Integer itemSubCategory = cursor.getInt(cursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_SUBCATEGORY));
         String itemName = cursor.getString(cursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_NAME));
+        Double itemWarmth = cursor.getDouble(cursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
         String picturePath = cursor.getString(cursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE));
 
         // If the item name is empty string or null, then use some default text
@@ -79,6 +81,9 @@ public class ClothesCursorAdapter extends CursorAdapter {
         // Update the TextViews with the attributes for the current pet
         subcategoryTextView.setText(ClothesEntry.getSubCategoryName(itemSubCategory));
         nameTextView.setText(itemName);
+
+        double roundOff = (double) Math.round(itemWarmth * 100) / 100;
+        warmthView.setText(Double.toString(roundOff));
 
         if (!TextUtils.isEmpty(picturePath)) {
             imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));

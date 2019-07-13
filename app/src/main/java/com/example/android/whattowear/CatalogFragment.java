@@ -167,7 +167,8 @@ public class CatalogFragment extends Fragment
                 ClothesEntry._ID,
                 ClothesEntry.COLUMN_ARTICLE_SUBCATEGORY,
                 ClothesEntry.COLUMN_ARTICLE_NAME,
-                ClothesEntry.COLUMN_ARTICLE_IMAGE};
+                ClothesEntry.COLUMN_ARTICLE_IMAGE,
+                ClothesEntry.COLUMN_ARTICLE_WARMTH};
 
         // This loader will execute the ContentProvider's query method on a background thread
         return new CursorLoader(getActivity(),    // Parent activity's context
