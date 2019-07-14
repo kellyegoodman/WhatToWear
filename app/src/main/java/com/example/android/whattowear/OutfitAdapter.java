@@ -23,6 +23,8 @@ public class OutfitAdapter extends ArrayAdapter<Outfit> {
 
     private Activity mContext;
 
+    private double mDesriedWarmth;
+
     public OutfitAdapter(Activity context, ArrayList<Outfit> input) {
         super(context, 0, input);
         mContext = context;
@@ -36,17 +38,16 @@ public class OutfitAdapter extends ArrayAdapter<Outfit> {
             listItemView = LayoutInflater.from(getContext()).inflate(
                     R.layout.outfit_display, parent, false);
         }
-        TextView summary_view = (TextView) listItemView.findViewById(R.id.outfit_header);
-        summary_view.setText(getContext().getString(R.string.outfit_default_text, position+1));
 
         // Get the {@link Outfit} object located at this position in the list
-        List<Outfit.ClothingItem> currentOutfit = getItem(position).getClothes();
+        Outfit currentOutfit = getItem(position);
+        List<Outfit.ClothingItem> outfit_list = getItem(position).getClothes();
 
         // get views
         ImageView topView = (ImageView) listItemView.findViewById(R.id.top_view);
         ImageView bottomView  = (ImageView) listItemView.findViewById(R.id.bottom_view);
 
-        for (Outfit.ClothingItem item : currentOutfit) {
+        for (Outfit.ClothingItem item : outfit_list) {
             if (!TextUtils.isEmpty(item.getImage())) {
                 switch (item.getType()) {
                     case Outfit.TOP:
@@ -60,8 +61,17 @@ public class OutfitAdapter extends ArrayAdapter<Outfit> {
             }
         }
 
+        TextView summary_view = (TextView) listItemView.findViewById(R.id.outfit_header);
+        summary_view.setText(getContext().getString(R.string.outfit_default_text,
+                position+1,currentOutfit.getWarmth(),mDesriedWarmth));
+
         // Return the whole list item layout (containing 3 TextViews)
         // so that it can be shown in the ListView
         return listItemView;
+    }
+
+    // TODO: remove, for debugging
+    public void setOptWarmth(double optWarmth) {
+        mDesriedWarmth = optWarmth;
     }
 }

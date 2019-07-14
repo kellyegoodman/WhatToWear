@@ -84,26 +84,51 @@ public class OutfitLogic {
             return;
         }
 
-        Outfit best_outfit = getBestTopBottom();
+        Outfit best_outfit = getBestTopBottom(mWarmthRequest);
 
         mIsLoadingDone = true;
         mParent.addOutfit(best_outfit);
     }
 
-    private Outfit getBestTopBottom() {
+    private Outfit getBestTopBottom(double desired_sum) {
         Outfit outfit = new Outfit();
-        if (m_topCursor.moveToFirst()) {
-            String imagePath = m_topCursor.getString(m_topCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE));
-            double warmth = m_topCursor.getDouble(m_topCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
+        double diff = Double.MAX_VALUE;
+        int result_top_position = 0;
+        int result_bottom_position = 0;
+        double top_warmth;
+        double bottom_warmth;
+        if (m_topCursor.moveToFirst() && m_bottomCursor.moveToLast()) {
+            while (!m_topCursor.isAfterLast() && !m_bottomCursor.isBeforeFirst()) {
+                // if this combo is closer to desired, update result
+                top_warmth = m_topCursor.getDouble(m_topCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
+                bottom_warmth = m_bottomCursor.getDouble(m_bottomCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
+                if (Math.abs(top_warmth + bottom_warmth - desired_sum) < diff) {
+                    diff = Math.abs(top_warmth + bottom_warmth - desired_sum);
+                    result_top_position = m_topCursor.getPosition();
+                    result_bottom_position = m_bottomCursor.getPosition();
+                }
 
-            outfit.addItem(new ClothingItem(Outfit.TOP, imagePath, warmth));
-        }
+                // shift next check based on whether this combo is greater than or less than desired
+                if (top_warmth + bottom_warmth < desired_sum) {
+                    m_topCursor.moveToNext();
+                } else {
+                    m_bottomCursor.moveToPrevious();
+                }
+            }
 
-        if (m_bottomCursor.moveToFirst()) {
-            String imagePath = m_bottomCursor.getString(m_bottomCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE));
-            double warmth = m_bottomCursor.getDouble(m_bottomCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
+            if (m_topCursor.moveToPosition(result_top_position)) {
+                String imagePath = m_topCursor.getString(m_topCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE));
+                double warmth = m_topCursor.getDouble(m_topCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
 
-            outfit.addItem(new ClothingItem(Outfit.BOTTOM, imagePath, warmth));
+                outfit.addItem(new ClothingItem(Outfit.TOP, imagePath, warmth));
+            }
+
+            if (m_bottomCursor.moveToPosition(result_bottom_position)) {
+                String imagePath = m_bottomCursor.getString(m_bottomCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE));
+                double warmth = m_bottomCursor.getDouble(m_bottomCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
+
+                outfit.addItem(new ClothingItem(Outfit.BOTTOM, imagePath, warmth));
+            }
         }
         return outfit;
     }
