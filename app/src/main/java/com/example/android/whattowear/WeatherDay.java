@@ -36,7 +36,4 @@ public class WeatherDay {
     public double getHighTemperature() { return mHighTemperature; }
 
     public double getLowTemperature() { return mLowTemperature; }
-
-    // TODO: remove, for testing
-    public void setHighTemperature(double new_high) { mHighTemperature = new_high; }
 }

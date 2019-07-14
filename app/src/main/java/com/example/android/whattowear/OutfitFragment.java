@@ -77,7 +77,7 @@ public class OutfitFragment extends Fragment {
     }
 
     private double TempToDesiredWarmth(double temp_in_C) {
-        return 4000 - (100* temp_in_C);
+        return 4000 - (100 * temp_in_C);
     }
 
     // Weather Data callback
@@ -128,13 +128,10 @@ public class OutfitFragment extends Fragment {
 
             // If there is a valid {@link WeatherDay}, then update the display.
             if (weather != null) {
-                // TODO: remove, testing
-                //weather.setHighTemperature(50.0);
-
                 // set the desired warmth factor
-                if (mTemperatureUnits == getString(R.string.settings_units_Celsius_value)) {
+                if (mTemperatureUnits.equals(getString(R.string.settings_units_Celsius_value))) {
                     mOptimalOutfitWarmth = TempToDesiredWarmth(weather.getHighTemperature());
-                } else if (mTemperatureUnits == getString(R.string.settings_units_Farenheit_value)) {
+                } else if (mTemperatureUnits.equals(getString(R.string.settings_units_Farenheit_value))) {
                     mOptimalOutfitWarmth = TempToDesiredWarmth(FarenheitToCelsius(
                             weather.getHighTemperature()));
                 }

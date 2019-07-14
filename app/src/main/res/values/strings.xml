@@ -5,7 +5,7 @@
 
     <string name="weather_summary_title">Today\'s Weather</string>
 
-    <string name="outfit_default_text">Outfit %d</string>
+    <string name="outfit_default_text">Outfit %d: W=%.1f, W_desired=%.1f</string>
 
     <string name="page_outfit_recommendations">Outfits</string>
 
