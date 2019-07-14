@@ -5,6 +5,8 @@
 
     <string name="weather_summary_title">Today\'s Weather</string>
 
+    <string name="outfit_default_text">Outfit %d</string>
+
     <string name="page_outfit_recommendations">Outfits</string>
 
     <string name="page_weather">Weather</string>
@@ -162,6 +164,10 @@
     <string name="subcategory_jacket">Jacket</string>
     <!-- Label for dropdown menu option if the pet's gender is unknown [CHAR LIMIT=20] -->
     <string name="subcategory_coat">Coat</string>
+
+    <string name="casual">Casual</string>
+
+    <string name="formal">Formal</string>
 
     <!-- Toast message in editor when new pet has been successfully inserted [CHAR LIMIT=NONE] -->
     <string name="editor_insert_item_successful">Item saved</string>

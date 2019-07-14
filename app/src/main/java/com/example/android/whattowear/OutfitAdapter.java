@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.android.whattowear.Outfit;
 import com.example.android.whattowear.R;
@@ -35,6 +36,9 @@ public class OutfitAdapter extends ArrayAdapter<Outfit> {
             listItemView = LayoutInflater.from(getContext()).inflate(
                     R.layout.outfit_display, parent, false);
         }
+        TextView summary_view = (TextView) listItemView.findViewById(R.id.outfit_header);
+        summary_view.setText(getContext().getString(R.string.outfit_default_text, position+1));
+
         // Get the {@link Outfit} object located at this position in the list
         List<Outfit.ClothingItem> currentOutfit = getItem(position).getClothes();
 
