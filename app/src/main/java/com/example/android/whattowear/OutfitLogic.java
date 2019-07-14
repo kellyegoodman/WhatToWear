@@ -16,9 +16,13 @@ import android.support.v4.widget.CursorAdapter;
 import android.text.Layout;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import com.example.android.whattowear.Outfit.ClothingItem;
 
 import com.example.android.whattowear.data.ClothesContract.ClothesEntry;
 
@@ -36,79 +40,72 @@ public class OutfitLogic {
     private static final int OUTER2_LOADER_ID = 3;
 
     private Context m_context;
+    private OutfitFragment mParent;
     private int mTag;
 
     private int mTasksLeft;
     private boolean mIsLoadingDone;
     private boolean mHasWarmthRequest;
+    private double mWarmthRequest;
 
     private Cursor m_topCursor;
     private Cursor m_bottomCursor;
 
-    public OutfitLogic(Context context, LoaderManager loaderManager, int tag) {
+    public OutfitLogic(Context context, OutfitFragment parent, LoaderManager loaderManager, int tag) {
         m_context = context;
+        mParent = parent;
         mTag = tag;
         mTasksLeft = 2;
-        mIsLoadingDone = false;
         mHasWarmthRequest = false;
+        mIsLoadingDone = false;
         loaderManager.initLoader(tag + TOP_LOADER_ID, null, topLoaderListener);
         loaderManager.initLoader(tag + BOTTOM_LOADER_ID, null, bottomLoaderListener);
     }
 
     public void FetchOutfit(double warmth_request) {
+        mWarmthRequest = warmth_request;
         mHasWarmthRequest = true;
         if (mTasksLeft==0){
             onAllTasksCompleted();
         }
     }
 
-    public void onAllTasksCompleted() {
-        // TODO: launch outfit logic
-        // Get references to the necessary item views
-        ImageView topView;
-        ImageView bottomView;
-        switch (mTag) {
-            case FORMAL_TAG:
-                topView = (ImageView) ((Activity)m_context).findViewById(R.id.formal_top_view);
-                bottomView = (ImageView) ((Activity)m_context).findViewById(R.id.formal_bottom_view);
-                break;
-            case CASUAL_TAG:
-            default:
-                topView = (ImageView) ((Activity)m_context).findViewById(R.id.casual_top_view);
-                bottomView = (ImageView) ((Activity)m_context).findViewById(R.id.casual_bottom_view);
-        }
-        View emptyView = ((Activity)m_context).findViewById(R.id.empty_outfit_view);
-
-        // get the imagess
-        String picturePathTop = null;
-        if (m_topCursor.moveToFirst()) {
-            picturePathTop = m_topCursor.getString(m_topCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE));
-        }
-        String picturePathBottom = null;
-        if (m_bottomCursor.moveToFirst()) {
-            picturePathBottom = m_bottomCursor.getString(m_bottomCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE));
-        }
-
-        displayItem(topView, picturePathTop);
-        displayItem(bottomView, picturePathBottom);
-        emptyView.setVisibility(View.GONE);
-    }
-
     public void taskComplete() {
         mTasksLeft--;
-        if (mTasksLeft==0){
-            mIsLoadingDone = true;
-            if (mHasWarmthRequest) {
-                onAllTasksCompleted();
-            }
+        if ((mTasksLeft==0) & mHasWarmthRequest){
+            onAllTasksCompleted();
         }
     }
 
-    private void displayItem(ImageView view, String picturePath) {
-        if (!TextUtils.isEmpty(picturePath)) {
-            view.setImageBitmap(BitmapFactory.decodeFile(picturePath));
-            view.setVisibility(View.VISIBLE);
+    public void onAllTasksCompleted() {
+        // TODO: launch outfit logic
+        if (mIsLoadingDone) {
+            // nothing to do
+            return;
         }
+
+        Outfit best_outfit = getBestTopBottom();
+
+        mIsLoadingDone = true;
+        mParent.addOutfit(best_outfit);
+    }
+
+    private Outfit getBestTopBottom() {
+        Outfit outfit = new Outfit();
+        if (m_topCursor.moveToFirst()) {
+            String imagePath = m_topCursor.getString(m_topCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE));
+            double warmth = m_topCursor.getDouble(m_topCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
+
+            outfit.addItem(new ClothingItem(Outfit.TOP, imagePath, warmth));
+        }
+
+        if (m_bottomCursor.moveToFirst()) {
+            String imagePath = m_bottomCursor.getString(m_bottomCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE));
+            double warmth = m_bottomCursor.getDouble(m_bottomCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
+
+            outfit.addItem(new ClothingItem(Outfit.BOTTOM, imagePath, warmth));
+        }
+        return outfit;
     }
 
     // TODO: sort queries by warmth
@@ -145,9 +142,9 @@ public class OutfitLogic {
             return new CursorLoader(m_context,    // Parent activity's context
                     ClothesEntry.CONTENT_URI,       // Provider content URI to query
                     projection,                     // Columns to include in the resulting cursor
-                    selection,                   // No selection clause
-                    selectionArgs,                // No selection arguments
-                    null);                 // Default sort order
+                    selection,                   // selection clause
+                    selectionArgs,                // selection arguments
+                    ClothesEntry.COLUMN_ARTICLE_WARMTH);   // sort order
         }
 
         @Override
@@ -203,9 +200,9 @@ public class OutfitLogic {
             return new CursorLoader(m_context,    // Parent activity's context
                     ClothesEntry.CONTENT_URI,       // Provider content URI to query
                     projection,                     // Columns to include in the resulting cursor
-                    selection,                   // No selection clause
-                    selectionArgs,                // No selection arguments
-                    null);                 // Default sort order
+                    selection,                   // selection clause
+                    selectionArgs,                // selection arguments
+                    ClothesEntry.COLUMN_ARTICLE_WARMTH);                 // sort order
         }
 
         @Override

@@ -1,6 +1,7 @@
 package com.example.android.whattowear;
 
 
+import android.app.Activity;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
@@ -34,6 +35,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.example.android.whattowear.data.ClothesContract.ClothesEntry;
 import com.example.android.whattowear.data.ClothesProvider;
 
@@ -56,6 +60,8 @@ public class OutfitFragment extends Fragment {
     /** TextView that is displayed when weather data is unavailable */
     private TextView mEmptyStateTextView;
 
+    private View mEmptyOutfitView;
+
     private String mTemperatureUnits;
 
     private double mOptimalOutfitWarmth;
@@ -65,6 +71,9 @@ public class OutfitFragment extends Fragment {
 
     private OutfitLogic m_casualOutfitLogic;
     private OutfitLogic m_formalOutfitLogic;
+
+    /** Adapter for the list of outfits */
+    private OutfitAdapter mAdapter;
 
     // Weather Data callback
     private LoaderManager.LoaderCallbacks<WeatherDay> weatherLoaderListener
@@ -191,16 +200,24 @@ public class OutfitFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.activity_outfits, container, false);
+        ListView outfitListView = (ListView) rootView.findViewById(R.id.outfit_list);
 
         // populate options menu
         setHasOptionsMenu(true);
 
         // populate outfit recommendations TODO
-        View emptyView = rootView.findViewById(R.id.empty_outfit_view);
-        emptyView.setVisibility(View.VISIBLE);
+        mEmptyOutfitView = rootView.findViewById(R.id.empty_outfit_view);
+        outfitListView.setEmptyView(mEmptyOutfitView);
 
-        m_casualOutfitLogic = new OutfitLogic(getContext(), getLoaderManager(), OutfitLogic.CASUAL_TAG);
-        m_formalOutfitLogic = new OutfitLogic(getContext(), getLoaderManager(), OutfitLogic.FORMAL_TAG);
+        // Create a new adapter that takes an empty list of outfits as input
+        mAdapter = new OutfitAdapter(getActivity(), new ArrayList<Outfit>());
+
+        // Set the adapter on the {@link ListView}
+        // so the list can be populated in the user interface
+        outfitListView.setAdapter(mAdapter);
+
+        m_casualOutfitLogic = new OutfitLogic(getContext(), this,  getLoaderManager(), OutfitLogic.CASUAL_TAG);
+        m_formalOutfitLogic = new OutfitLogic(getContext(), this, getLoaderManager(), OutfitLogic.FORMAL_TAG);
 
         // Find a reference to the daily_weather_display view in the layout
         LinearLayout dailyWeatherView = (LinearLayout) rootView.findViewById(R.id.daily_weather_display);
@@ -260,6 +277,13 @@ public class OutfitFragment extends Fragment {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void addOutfit(Outfit outfit) {
+        View emptyView = getView().findViewById(R.id.empty_outfit_view);
+        emptyView.setVisibility(View.GONE);
+
+        mAdapter.add(outfit);
     }
 
 }

@@ -42,7 +42,7 @@ public class WeatherHourAdapter extends ArrayAdapter<WeatherHour> {
         // Get the {@link WeatherHour} object located at this position in the list
         WeatherHour currentWeatherHour = getItem(position);
 
-        // Find the TextView with view ID temperature
+        // Find the ImageView with view ID icon_view
         ImageView iconView = (ImageView) listItemView.findViewById(R.id.icon_view);
 
         int id = mContext.getResources().getIdentifier(currentWeatherHour.getWeatherIconCode(), "drawable",

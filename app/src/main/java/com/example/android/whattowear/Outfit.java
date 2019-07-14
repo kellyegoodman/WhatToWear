@@ -1,5 +1,6 @@
 package com.example.android.whattowear;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Outfit {
@@ -10,7 +11,7 @@ public class Outfit {
     public static final int OUTER1 = 3;
     public static final int OUTER2 = 4;
 
-    public class ClothingItem {
+    public static class ClothingItem {
         private int mType;
         private String mImagePath;
         private double mWarmth;
@@ -26,7 +27,7 @@ public class Outfit {
         public double getWarmth() { return mWarmth; }
     }
 
-    private List<ClothingItem> mClothingList;
+    private ArrayList<ClothingItem> mClothingList = new ArrayList<>();
 
     public Outfit() {
         // nothing to do
@@ -45,5 +46,9 @@ public class Outfit {
             warmth += item.getWarmth();
         }
         return warmth;
+    }
+
+    public List<ClothingItem> getClothes() {
+        return mClothingList;
     }
 }
