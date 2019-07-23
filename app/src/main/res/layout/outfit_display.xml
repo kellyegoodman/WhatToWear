@@ -23,28 +23,75 @@
         android:layout_gravity="center_horizontal"
         android:textAppearance="?android:textAppearanceMedium"/>
 
-    <!-- Top, bottom view -->
+    <!-- Outfit view -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="horizontal">
 
-        <ImageView
-            android:id="@+id/top_view"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1.2"
-            android:scaleType="fitXY"
-            android:maxHeight="100dp"
-            android:layout_gravity="center"/>
+        <!-- Top, bottom view -->
+        <LinearLayout
+            android:id="@+id/top_bottom_wrapper"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="0.8">
 
-        <ImageView
-            android:id="@+id/bottom_view"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1.5"
-            android:scaleType="fitXY"
-            android:maxHeight="100dp"
-            android:layout_gravity="center"/>
+            <ImageView
+                android:id="@+id/top_view"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1.2"
+                android:scaleType="fitXY"
+                android:maxHeight="100dp"
+                android:layout_gravity="center"/>
+
+            <ImageView
+                android:id="@+id/bottom_view"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1.5"
+                android:scaleType="fitXY"
+                android:maxHeight="100dp"
+                android:layout_gravity="center"/>
+        </LinearLayout>
+
+        <!-- dress wrapper -->
+        <LinearLayout
+            android:id="@+id/dress_wrapper"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="0">
+
+            <ImageView
+                android:id="@+id/dress_view"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:scaleType="fitXY"
+                android:maxHeight="100dp"
+                android:layout_gravity="center"/>
+        </LinearLayout>
+
+        <!-- jacket wrapper -->
+        <LinearLayout
+            android:id="@+id/jacket_wrapper"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="0">
+
+            <ImageView
+                android:id="@+id/jacket_view"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:scaleType="fitXY"
+                android:maxHeight="100dp"
+                android:layout_gravity="center"/>
+        </LinearLayout>
+
     </LinearLayout>
+
 </LinearLayout>

@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.android.whattowear.Outfit;
@@ -41,17 +42,45 @@ public class OutfitAdapter extends ArrayAdapter<Outfit> {
 
         // Get the {@link Outfit} object located at this position in the list
         Outfit currentOutfit = getItem(position);
+        // TODO: have empty view in outfit_display, handle empty outfit here
+        if (!currentOutfit.isValid()) {
+            return listItemView;
+        }
         List<Outfit.ClothingItem> outfit_list = getItem(position).getClothes();
 
         // get views
         ImageView topView = (ImageView) listItemView.findViewById(R.id.top_view);
         ImageView bottomView  = (ImageView) listItemView.findViewById(R.id.bottom_view);
+        ImageView dressView = (ImageView) listItemView.findViewById(R.id.dress_view);
+        ImageView jacketView  = (ImageView) listItemView.findViewById(R.id.jacket_view);
+        LinearLayout topBottomWrapper = (LinearLayout) listItemView.findViewById(R.id.top_bottom_wrapper);
+        LinearLayout dressWrapper = (LinearLayout) listItemView.findViewById(R.id.dress_wrapper);
+        LinearLayout jacketWrapper = (LinearLayout) listItemView.findViewById(R.id.jacket_wrapper);
+        LinearLayout.LayoutParams top_bottom_view_params = (LinearLayout.LayoutParams) topBottomWrapper.getLayoutParams();
+        LinearLayout.LayoutParams dress_view_params = (LinearLayout.LayoutParams) dressWrapper.getLayoutParams();
+        LinearLayout.LayoutParams jacket_view_params = (LinearLayout.LayoutParams) jacketWrapper.getLayoutParams();
 
         for (Outfit.ClothingItem item : outfit_list) {
             if (!TextUtils.isEmpty(item.getImage())) {
                 switch (item.getType()) {
                     case Outfit.TOP:
                         topView.setImageBitmap(BitmapFactory.decodeFile(item.getImage()));
+                        dress_view_params.weight = 0.0f;
+                        dressWrapper.setLayoutParams(dress_view_params);
+                        top_bottom_view_params.weight = 0.8f;
+                        topBottomWrapper.setLayoutParams(top_bottom_view_params);
+                        break;
+                    case Outfit.DRESS:
+                        dressView.setImageBitmap(BitmapFactory.decodeFile(item.getImage()));
+                        dress_view_params.weight = 0.8f;
+                        dressWrapper.setLayoutParams(dress_view_params);
+                        top_bottom_view_params.weight = 0.0f;
+                        topBottomWrapper.setLayoutParams(top_bottom_view_params);
+                        break;
+                    case Outfit.OUTER1:
+                        jacketView.setImageBitmap(BitmapFactory.decodeFile(item.getImage()));
+                        jacket_view_params.weight = 1.0f;
+                        jacketWrapper.setLayoutParams(jacket_view_params);
                         break;
                     case Outfit.BOTTOM:
                     default:

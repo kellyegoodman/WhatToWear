@@ -48,7 +48,36 @@ public class Outfit {
         return warmth;
     }
 
-    public List<ClothingItem> getClothes() {
-        return mClothingList;
+    public boolean isEmpty() { return mClothingList.isEmpty(); }
+
+    public boolean isValid() {
+        // does outfit have ((top AND bottom) XOR dress)
+        // does outfit have no more than one top, bottom, or dress
+        boolean hasTop = false;
+        boolean hasBottom = false;
+        boolean hasDress = false;
+
+        for (ClothingItem item : mClothingList) {
+            switch (item.getType()) {
+                case TOP:
+                    if (hasTop) return false;
+                    hasTop = true;
+                    break;
+                case BOTTOM:
+                    if (hasBottom) return false;
+                    hasBottom = true;
+                    break;
+                case DRESS:
+                    if (hasDress) return false;
+                    hasDress = true;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        return ((hasTop & hasBottom) ^ hasDress);
     }
+
+    public List<ClothingItem> getClothes() { return mClothingList; }
 }
