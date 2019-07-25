@@ -1,33 +1,13 @@
 package com.example.android.whattowear;
 
-import android.app.Activity;
-import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.BitmapFactory;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
-import android.support.v4.widget.CursorAdapter;
-import android.text.Layout;
-import android.text.TextUtils;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import com.example.android.whattowear.Outfit.ClothingItem;
-
 import com.example.android.whattowear.data.ClothesContract.ClothesEntry;
 
 public class OutfitLogic {
-
+    /** Tag for log messages */
     public static final String LOG_TAG = OutfitLogic.class.getName();
 
     public static final int CASUAL_TAG = 3;
@@ -47,10 +27,11 @@ public class OutfitLogic {
     private boolean mHasWarmthRequest;
     private double mWarmthRequest;
 
-    private Cursor m_topCursor;
-    private Cursor m_bottomCursor;
-    private Cursor m_jacketCursor;
-    private Cursor m_dressCursor;
+    /** Loaders for the different clothing categories */
+    private ClothesLoader mTopLoaderListener;
+    private ClothesLoader mBottomLoaderListener;
+    private ClothesLoader mDressLoaderListener;
+    private ClothesLoader mOuterLoaderListener;
 
     public OutfitLogic(Context context, OutfitFragment parent, LoaderManager loaderManager, int tag) {
         m_context = context;
@@ -59,12 +40,48 @@ public class OutfitLogic {
         mTasksLeft = 4;
         mHasWarmthRequest = false;
         mIsLoadingDone = false;
-        loaderManager.initLoader(tag + TOP_LOADER_ID, null, topLoaderListener);
-        loaderManager.initLoader(tag + BOTTOM_LOADER_ID, null, bottomLoaderListener);
-        loaderManager.initLoader(tag + OUTER_LOADER_ID, null, jacketLoaderListener);
-        loaderManager.initLoader(tag + DRESS_LOADER_ID, null, dressLoaderListener);
+
+        // construct category loaders
+        switch (mTag) {
+            case FORMAL_TAG:
+                mTopLoaderListener = new ClothesLoader(m_context, this,
+                        new String[]{String.valueOf(ClothesEntry.SUBCATEGORY_BLOUSE)});
+                mBottomLoaderListener = new ClothesLoader(m_context, this,
+                        new String[] {String.valueOf(ClothesEntry.SUBCATEGORY_SLACKS),
+                        String.valueOf(ClothesEntry.SUBCATEGORY_SKIRT)});
+                mDressLoaderListener = new ClothesLoader(m_context, this,
+                        new String[] {String.valueOf(ClothesEntry.SUBCATEGORY_FORMAL_DRESS)});
+                mOuterLoaderListener = new ClothesLoader(m_context, this,
+                        new String[] {String.valueOf(ClothesEntry.SUBCATEGORY_SWEATER),
+                        String.valueOf(ClothesEntry.SUBCATEGORY_CARDIGAN),
+                        String.valueOf(ClothesEntry.SUBCATEGORY_COAT)});
+                break;
+            case CASUAL_TAG:
+            default:
+                mTopLoaderListener = new ClothesLoader(m_context, this,
+                        new String[]{String.valueOf(ClothesEntry.SUBCATEGORY_TSHIRT),
+                        String.valueOf(ClothesEntry.SUBCATEGORY_LONGSLEEVE)});
+                mBottomLoaderListener = new ClothesLoader(m_context, this,
+                        new String[] {String.valueOf(ClothesEntry.SUBCATEGORY_CASUAL_PANTS),
+                        String.valueOf(ClothesEntry.SUBCATEGORY_SHORTS),
+                        String.valueOf(ClothesEntry.SUBCATEGORY_SKIRT)});
+                mDressLoaderListener = new ClothesLoader(m_context, this,
+                        new String[] {String.valueOf(ClothesEntry.SUBCATEGORY_CASUAL_DRESS)});
+                mOuterLoaderListener = new ClothesLoader(m_context, this,
+                        new String[] {String.valueOf(ClothesEntry.SUBCATEGORY_HOODIE),
+                        String.valueOf(ClothesEntry.SUBCATEGORY_SWEATER),
+                        String.valueOf(ClothesEntry.SUBCATEGORY_JACKET)});
+        }
+
+        // run the category querys
+        loaderManager.initLoader(tag + TOP_LOADER_ID, null, mTopLoaderListener);
+        loaderManager.initLoader(tag + BOTTOM_LOADER_ID, null, mBottomLoaderListener);
+        loaderManager.initLoader(tag + OUTER_LOADER_ID, null, mOuterLoaderListener);
+        loaderManager.initLoader(tag + DRESS_LOADER_ID, null, mDressLoaderListener);
     }
 
+    /** This sets the requested warmth, if this is the last async task to completed, launch
+     * the outfit logic */
     public void FetchOutfit(double warmth_request) {
         mWarmthRequest = warmth_request;
         mHasWarmthRequest = true;
@@ -73,6 +90,7 @@ public class OutfitLogic {
         }
     }
 
+    /** Callback to keep track of how many category loaders have finished loading */
     public void taskComplete() {
         mTasksLeft--;
         if ((mTasksLeft==0) & mHasWarmthRequest){
@@ -80,28 +98,30 @@ public class OutfitLogic {
         }
     }
 
+    /** Launch the outfit logic once all category loaders have finished */
     public void onAllTasksCompleted() {
-        // TODO: launch outfit logic
         if (mIsLoadingDone) {
             // nothing to do
             return;
         }
 
-        // save best top, bottom combo
+        Outfit temp;
+        // get best top, bottom combo
         Outfit best_outfit = getBestTopBottom(mWarmthRequest);
         double diff = Math.abs(mWarmthRequest - best_outfit.getWarmth());
-        // save best dress
-        Outfit best_dress = getBestDress(mWarmthRequest);
-        double dress_diff = Math.abs(mWarmthRequest - best_dress.getWarmth());
 
-        Outfit best_with_jacket = getBestWithJacket(mWarmthRequest);
-        double jacket_diff = Math.abs(mWarmthRequest - best_with_jacket.getWarmth());
+        // get best dress
+        temp = getBestDress(mWarmthRequest);
+        if (best_outfit.isEmpty() || (!temp.isEmpty() && (Math.abs(mWarmthRequest - temp.getWarmth()) < diff))) {
+            best_outfit = temp;
+            diff = Math.abs(mWarmthRequest - temp.getWarmth());
+        }
 
-        // if the jacket combo is better, show the jacket combo
-        if ((jacket_diff < diff) && (jacket_diff < dress_diff)) {
-            best_outfit = best_with_jacket;
-        } else if ((dress_diff < diff) && (dress_diff < jacket_diff)) {
-            best_outfit = best_dress;
+        // get best jacket outfit
+        temp= getBestWithJacket(mWarmthRequest);
+        if (best_outfit.isEmpty() || (!temp.isEmpty() && (Math.abs(mWarmthRequest - temp.getWarmth()) < diff))) {
+            best_outfit = temp;
+            diff = Math.abs(mWarmthRequest - temp.getWarmth());
         }
 
         mIsLoadingDone = true;
@@ -110,23 +130,24 @@ public class OutfitLogic {
 
     // TODO: binary search
     private Outfit getBestDress(double desired_sum) {
+        Cursor dressCursor = mDressLoaderListener.getCursor();
         Outfit outfit = new Outfit();
         double diff = Double.MAX_VALUE;
         int result_position = 0;
         double dress_warmth;
-        if (m_dressCursor.moveToFirst()) {
-            while (!m_dressCursor.isAfterLast()) {
-                dress_warmth = m_dressCursor.getDouble(m_dressCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
+        if (dressCursor.moveToFirst()) {
+            while (!dressCursor.isAfterLast()) {
+                dress_warmth = dressCursor.getDouble(dressCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
                 if (Math.abs(dress_warmth - desired_sum) < diff) {
                     diff = Math.abs(dress_warmth - desired_sum);
-                    result_position = m_dressCursor.getPosition();
+                    result_position = dressCursor.getPosition();
                 }
-                m_dressCursor.moveToNext();
+                dressCursor.moveToNext();
             }
 
-            if (m_dressCursor.moveToPosition(result_position)) {
-                String imagePath = m_dressCursor.getString(m_dressCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE));
-                double warmth = m_dressCursor.getDouble(m_dressCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
+            if (dressCursor.moveToPosition(result_position)) {
+                String imagePath = dressCursor.getString(dressCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE));
+                double warmth = dressCursor.getDouble(dressCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
 
                 outfit.addItem(new ClothingItem(Outfit.DRESS, imagePath, warmth));
             }
@@ -134,41 +155,43 @@ public class OutfitLogic {
         return outfit;
     }
     private Outfit getBestTopBottom(double desired_sum) {
+        Cursor topCursor = mTopLoaderListener.getCursor();
+        Cursor bottomCursor = mBottomLoaderListener.getCursor();
         Outfit outfit = new Outfit();
         double diff = Double.MAX_VALUE;
         int result_top_position = 0;
         int result_bottom_position = 0;
         double top_warmth;
         double bottom_warmth;
-        if (m_topCursor.moveToFirst() && m_bottomCursor.moveToLast()) {
-            while (!m_topCursor.isAfterLast() && !m_bottomCursor.isBeforeFirst()) {
+        if (topCursor.moveToFirst() && bottomCursor.moveToLast()) {
+            while (!topCursor.isAfterLast() && !bottomCursor.isBeforeFirst()) {
                 // if this combo is closer to desired, update result
-                top_warmth = m_topCursor.getDouble(m_topCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
-                bottom_warmth = m_bottomCursor.getDouble(m_bottomCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
+                top_warmth = topCursor.getDouble(topCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
+                bottom_warmth = bottomCursor.getDouble(bottomCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
                 if (Math.abs(top_warmth + bottom_warmth - desired_sum) < diff) {
                     diff = Math.abs(top_warmth + bottom_warmth - desired_sum);
-                    result_top_position = m_topCursor.getPosition();
-                    result_bottom_position = m_bottomCursor.getPosition();
+                    result_top_position = topCursor.getPosition();
+                    result_bottom_position = bottomCursor.getPosition();
                 }
 
                 // shift next check based on whether this combo is greater than or less than desired
                 if (top_warmth + bottom_warmth < desired_sum) {
-                    m_topCursor.moveToNext();
+                    topCursor.moveToNext();
                 } else {
-                    m_bottomCursor.moveToPrevious();
+                    bottomCursor.moveToPrevious();
                 }
             }
 
-            if (m_topCursor.moveToPosition(result_top_position)) {
-                String imagePath = m_topCursor.getString(m_topCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE));
-                double warmth = m_topCursor.getDouble(m_topCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
+            if (topCursor.moveToPosition(result_top_position)) {
+                String imagePath = topCursor.getString(topCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE));
+                double warmth = topCursor.getDouble(topCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
 
                 outfit.addItem(new ClothingItem(Outfit.TOP, imagePath, warmth));
             }
 
-            if (m_bottomCursor.moveToPosition(result_bottom_position)) {
-                String imagePath = m_bottomCursor.getString(m_bottomCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE));
-                double warmth = m_bottomCursor.getDouble(m_bottomCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
+            if (bottomCursor.moveToPosition(result_bottom_position)) {
+                String imagePath = bottomCursor.getString(bottomCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE));
+                double warmth = bottomCursor.getDouble(bottomCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
 
                 outfit.addItem(new ClothingItem(Outfit.BOTTOM, imagePath, warmth));
             }
@@ -178,35 +201,36 @@ public class OutfitLogic {
 
     // O(n^2) need to optimize
     private Outfit getBestWithJacket(double desired_sum) {
+        Cursor jacketCursor = mOuterLoaderListener.getCursor();
         Outfit best_outfit = new Outfit();
         Outfit temp_top_bottom;
         Outfit temp_dress;
         double diff = Double.MAX_VALUE;
         double jacket_warmth = 0;
         int result_jacket_position = 0;
-        if (m_jacketCursor.moveToFirst()) {
-            while (!m_jacketCursor.isAfterLast()) {
-                jacket_warmth = m_jacketCursor.getDouble(m_jacketCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
+        if (jacketCursor.moveToFirst()) {
+            while (!jacketCursor.isAfterLast()) {
+                jacket_warmth = jacketCursor.getDouble(jacketCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
                 temp_top_bottom = getBestTopBottom(desired_sum - jacket_warmth);
                 temp_dress = getBestDress(desired_sum - jacket_warmth);
 
                 if (Math.abs(temp_top_bottom.getWarmth() + jacket_warmth - desired_sum) < diff) {
                     diff = Math.abs(temp_top_bottom.getWarmth() + jacket_warmth - desired_sum);
-                    result_jacket_position = m_jacketCursor.getPosition();
+                    result_jacket_position = jacketCursor.getPosition();
                     best_outfit = temp_top_bottom;
                 }
                 if (Math.abs(temp_dress.getWarmth() + jacket_warmth - desired_sum) < diff) {
                     diff = Math.abs(temp_dress.getWarmth() + jacket_warmth - desired_sum);
-                    result_jacket_position = m_jacketCursor.getPosition();
+                    result_jacket_position = jacketCursor.getPosition();
                     best_outfit = temp_dress;
                 }
 
-                m_jacketCursor.moveToNext();
+                jacketCursor.moveToNext();
             }
 
-            if (!best_outfit.isEmpty() && m_jacketCursor.moveToPosition(result_jacket_position)) {
-                String imagePath = m_jacketCursor.getString(m_jacketCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE));
-                double warmth = m_jacketCursor.getDouble(m_jacketCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
+            if (!best_outfit.isEmpty() && jacketCursor.moveToPosition(result_jacket_position)) {
+                String imagePath = jacketCursor.getString(jacketCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE));
+                double warmth = jacketCursor.getDouble(jacketCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
 
                 best_outfit.addItem(new ClothingItem(Outfit.OUTER1, imagePath, warmth));
             }
@@ -214,223 +238,4 @@ public class OutfitLogic {
         return best_outfit;
     }
 
-    private LoaderManager.LoaderCallbacks<Cursor> topLoaderListener
-            = new LoaderManager.LoaderCallbacks<Cursor>() {
-
-        @NonNull
-        @Override
-        public Loader<Cursor> onCreateLoader(int i, @Nullable Bundle bundle) {
-            // Define a projection that specifies which table columns we care about.
-            String[] projection = {
-                    ClothesEntry._ID,
-                    ClothesEntry.COLUMN_ARTICLE_CATEGORY,
-                    ClothesEntry.COLUMN_ARTICLE_SUBCATEGORY,
-                    ClothesEntry.COLUMN_ARTICLE_IMAGE,
-                    ClothesEntry.COLUMN_ARTICLE_WARMTH};
-
-            String selection;
-            String[] selectionArgs;
-            switch (mTag) {
-                case FORMAL_TAG:
-                    selection = ClothesEntry.COLUMN_ARTICLE_SUBCATEGORY + "=?";
-                    selectionArgs = new String[] {String.valueOf(ClothesEntry.SUBCATEGORY_BLOUSE)};
-                    break;
-                case CASUAL_TAG:
-                default:
-                    selection = ClothesEntry.COLUMN_ARTICLE_SUBCATEGORY + "=? OR "
-                            + ClothesEntry.COLUMN_ARTICLE_SUBCATEGORY + "=?";
-                    selectionArgs = new String[] {String.valueOf(ClothesEntry.SUBCATEGORY_TSHIRT),
-                            String.valueOf(ClothesEntry.SUBCATEGORY_LONGSLEEVE)};
-            }
-
-            // This loader will execute the ContentProvider's query method on a background thread
-            return new CursorLoader(m_context,    // Parent activity's context
-                    ClothesEntry.CONTENT_URI,       // Provider content URI to query
-                    projection,                     // Columns to include in the resulting cursor
-                    selection,                   // selection clause
-                    selectionArgs,                // selection arguments
-                    ClothesEntry.COLUMN_ARTICLE_WARMTH);   // sort order
-        }
-
-        @Override
-        public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
-            // store cursor
-            m_topCursor = cursor;
-            Log.v(LOG_TAG, "onLoadFinished");
-            taskComplete();
-        }
-
-        @Override
-        public void onLoaderReset(@NonNull Loader<Cursor> loader) {
-            // Callback called when data needs to be deleted
-            Log.v(LOG_TAG, "onLoaderReset");
-        }
-    };
-
-    private LoaderManager.LoaderCallbacks<Cursor> bottomLoaderListener
-            = new LoaderManager.LoaderCallbacks<Cursor>() {
-
-        @NonNull
-        @Override
-        public Loader<Cursor> onCreateLoader(int i, @Nullable Bundle bundle) {
-            // Define a projection that specifies which table columns we care about.
-            String[] projection = {
-                    ClothesEntry._ID,
-                    ClothesEntry.COLUMN_ARTICLE_CATEGORY,
-                    ClothesEntry.COLUMN_ARTICLE_SUBCATEGORY,
-                    ClothesEntry.COLUMN_ARTICLE_IMAGE,
-                    ClothesEntry.COLUMN_ARTICLE_WARMTH};
-
-            String selection;
-            String[] selectionArgs;
-            switch (mTag) {
-                case FORMAL_TAG:
-                    selection = ClothesEntry.COLUMN_ARTICLE_SUBCATEGORY + "=? OR "
-                            + ClothesEntry.COLUMN_ARTICLE_SUBCATEGORY + "=?";
-                    selectionArgs = new String[] {String.valueOf(ClothesEntry.SUBCATEGORY_SLACKS),
-                            String.valueOf(ClothesEntry.SUBCATEGORY_SKIRT)};
-                    break;
-                case CASUAL_TAG:
-                default:
-                    selection = ClothesEntry.COLUMN_ARTICLE_SUBCATEGORY + "=? OR "
-                            + ClothesEntry.COLUMN_ARTICLE_SUBCATEGORY + "=? OR "
-                            + ClothesEntry.COLUMN_ARTICLE_SUBCATEGORY + "=?";
-                    selectionArgs = new String[] {String.valueOf(ClothesEntry.SUBCATEGORY_CASUAL_PANTS),
-                            String.valueOf(ClothesEntry.SUBCATEGORY_SHORTS),
-                            String.valueOf(ClothesEntry.SUBCATEGORY_SKIRT)};
-            }
-
-            // This loader will execute the ContentProvider's query method on a background thread
-            return new CursorLoader(m_context,    // Parent activity's context
-                    ClothesEntry.CONTENT_URI,       // Provider content URI to query
-                    projection,                     // Columns to include in the resulting cursor
-                    selection,                   // selection clause
-                    selectionArgs,                // selection arguments
-                    ClothesEntry.COLUMN_ARTICLE_WARMTH);                 // sort order
-        }
-
-        @Override
-        public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
-            // store cursor
-            m_bottomCursor = cursor;
-            Log.v(LOG_TAG, "onLoadFinished");
-            taskComplete();
-        }
-
-        @Override
-        public void onLoaderReset(@NonNull Loader<Cursor> loader) {
-            // Callback called when data needs to be deleted
-            Log.v(LOG_TAG, "onLoaderReset");
-        }
-    };
-
-    private LoaderManager.LoaderCallbacks<Cursor> jacketLoaderListener
-            = new LoaderManager.LoaderCallbacks<Cursor>() {
-
-        @NonNull
-        @Override
-        public Loader<Cursor> onCreateLoader(int i, @Nullable Bundle bundle) {
-            // Define a projection that specifies which table columns we care about.
-            String[] projection = {
-                    ClothesEntry._ID,
-                    ClothesEntry.COLUMN_ARTICLE_CATEGORY,
-                    ClothesEntry.COLUMN_ARTICLE_SUBCATEGORY,
-                    ClothesEntry.COLUMN_ARTICLE_IMAGE,
-                    ClothesEntry.COLUMN_ARTICLE_WARMTH};
-
-            String selection;
-            String[] selectionArgs;
-            switch (mTag) {
-                case FORMAL_TAG:
-                    selection = ClothesEntry.COLUMN_ARTICLE_SUBCATEGORY + "=? OR "
-                            + ClothesEntry.COLUMN_ARTICLE_SUBCATEGORY + "=? OR "
-                            + ClothesEntry.COLUMN_ARTICLE_SUBCATEGORY + "=?";
-                    selectionArgs = new String[] {String.valueOf(ClothesEntry.SUBCATEGORY_SWEATER),
-                            String.valueOf(ClothesEntry.SUBCATEGORY_CARDIGAN),
-                            String.valueOf(ClothesEntry.SUBCATEGORY_COAT)};
-                    break;
-                case CASUAL_TAG:
-                default:
-                    selection = ClothesEntry.COLUMN_ARTICLE_SUBCATEGORY + "=? OR "
-                            + ClothesEntry.COLUMN_ARTICLE_SUBCATEGORY + "=? OR "
-                            + ClothesEntry.COLUMN_ARTICLE_SUBCATEGORY + "=?";
-                    selectionArgs = new String[] {String.valueOf(ClothesEntry.SUBCATEGORY_HOODIE),
-                            String.valueOf(ClothesEntry.SUBCATEGORY_SWEATER),
-                            String.valueOf(ClothesEntry.SUBCATEGORY_JACKET)};
-            }
-
-            // This loader will execute the ContentProvider's query method on a background thread
-            return new CursorLoader(m_context,    // Parent activity's context
-                    ClothesEntry.CONTENT_URI,       // Provider content URI to query
-                    projection,                     // Columns to include in the resulting cursor
-                    selection,                   // selection clause
-                    selectionArgs,                // selection arguments
-                    ClothesEntry.COLUMN_ARTICLE_WARMTH);   // sort order
-        }
-
-        @Override
-        public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
-            // store cursor
-            m_jacketCursor = cursor;
-            Log.v(LOG_TAG, "onLoadFinished");
-            taskComplete();
-        }
-
-        @Override
-        public void onLoaderReset(@NonNull Loader<Cursor> loader) {
-            // Callback called when data needs to be deleted
-            Log.v(LOG_TAG, "onLoaderReset");
-        }
-    };
-
-    private LoaderManager.LoaderCallbacks<Cursor> dressLoaderListener
-            = new LoaderManager.LoaderCallbacks<Cursor>() {
-
-        @NonNull
-        @Override
-        public Loader<Cursor> onCreateLoader(int i, @Nullable Bundle bundle) {
-            // Define a projection that specifies which table columns we care about.
-            String[] projection = {
-                    ClothesEntry._ID,
-                    ClothesEntry.COLUMN_ARTICLE_CATEGORY,
-                    ClothesEntry.COLUMN_ARTICLE_SUBCATEGORY,
-                    ClothesEntry.COLUMN_ARTICLE_IMAGE,
-                    ClothesEntry.COLUMN_ARTICLE_WARMTH};
-
-            String selection;
-            String[] selectionArgs;
-            switch (mTag) {
-                case FORMAL_TAG:
-                    selection = ClothesEntry.COLUMN_ARTICLE_SUBCATEGORY + "=?";
-                    selectionArgs = new String[] {String.valueOf(ClothesEntry.SUBCATEGORY_FORMAL_DRESS)};
-                    break;
-                case CASUAL_TAG:
-                default:
-                    selection = ClothesEntry.COLUMN_ARTICLE_SUBCATEGORY + "=?";
-                    selectionArgs = new String[] {String.valueOf(ClothesEntry.SUBCATEGORY_CASUAL_DRESS)};
-            }
-
-            // This loader will execute the ContentProvider's query method on a background thread
-            return new CursorLoader(m_context,    // Parent activity's context
-                    ClothesEntry.CONTENT_URI,       // Provider content URI to query
-                    projection,                     // Columns to include in the resulting cursor
-                    selection,                   // selection clause
-                    selectionArgs,                // selection arguments
-                    ClothesEntry.COLUMN_ARTICLE_WARMTH);   // sort order
-        }
-
-        @Override
-        public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
-            // store cursor
-            m_dressCursor = cursor;
-            Log.v(LOG_TAG, "onLoadFinished");
-            taskComplete();
-        }
-
-        @Override
-        public void onLoaderReset(@NonNull Loader<Cursor> loader) {
-            // Callback called when data needs to be deleted
-            Log.v(LOG_TAG, "onLoaderReset");
-        }
-    };
 }

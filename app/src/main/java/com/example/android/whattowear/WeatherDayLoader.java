@@ -15,7 +15,7 @@ public class WeatherDayLoader extends AsyncTaskLoader<WeatherDay> {
     private String mUrl;
 
     /**
-     * Constructs a new {@link WeatherHourLoader}.
+     * Constructs a new {@link WeatherDayLoader}.
      *
      * @param context of the activity
      * @param url to load data from
