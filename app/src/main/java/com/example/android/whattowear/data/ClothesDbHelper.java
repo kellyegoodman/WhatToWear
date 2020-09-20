@@ -1,17 +1,11 @@
 package com.example.android.whattowear.data;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.graphics.Bitmap;
 import android.util.Log;
 
-import com.example.android.whattowear.MainActivity;
 import com.example.android.whattowear.data.ClothesContract.ClothesEntry;
-
-import java.io.File;
-import java.io.FileOutputStream;
 
 public class ClothesDbHelper extends SQLiteOpenHelper {
 
@@ -45,7 +39,7 @@ public class ClothesDbHelper extends SQLiteOpenHelper {
                 + ClothesEntry.COLUMN_ARTICLE_CATEGORY + " INTEGER NOT NULL, "
                 + ClothesEntry.COLUMN_ARTICLE_SUBCATEGORY + " INTEGER NOT NULL, "
                 + ClothesEntry.COLUMN_ARTICLE_NAME + " TEXT, "
-                + ClothesEntry.COLUMN_ARTICLE_IMAGE + " TEXT, "
+                + ClothesEntry.COLUMN_ARTICLE_IMAGE + " BLOB, "
                 + ClothesEntry.COLUMN_ARTICLE_WEIGHT + " INTEGER NOT NULL DEFAULT 0, "
                 + ClothesEntry.COLUMN_ARTICLE_COTTON + " INTEGER NOT NULL DEFAULT 0, "
                 + ClothesEntry.COLUMN_ARTICLE_POLYESTER + " INTEGER NOT NULL DEFAULT 0, "

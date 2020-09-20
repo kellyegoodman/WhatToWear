@@ -20,13 +20,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Helper methods related to requesting and receiving earthquake data from USGS.
+ * Helper methods related to requesting and receiving weather data from the API.
  */
 public final class QueryUtils {
 
     public static final String API_KEY = "f094684ee2f4472eb7a5c2d423fa484d";
 
-    /** URL for hourly weather data from the WeatherBit dataset */
+    /** URL for hourly weather data from the openweathermap dataset */
     public static final String WEATHER_BIT_REQUEST_URL = "https://api.weatherbit.io/v2.0/forecast";
 
     /** Tag for the log messages */
@@ -41,7 +41,7 @@ public final class QueryUtils {
     }
 
     /**
-     * Query the USGS dataset and return a list of {@link WeatherHour} objects.
+     * Query the openweathermap dataset and return a list of {@link WeatherHour} objects.
      */
     public static List<WeatherHour> fetchHourlyForecast(String requestUrl) {
         // Create URL object
@@ -55,15 +55,15 @@ public final class QueryUtils {
             Log.e(LOG_TAG, "Problem making the HTTP request.", e);
         }
 
-        // Extract relevant fields from the JSON response and create a list of {@link Earthquake}s
+        // Extract relevant fields from the JSON response and create a list of {@link WeatherHour}s
         List<WeatherHour> hourlyForecasts = extractFeatureFromJson(jsonResponse);
 
-        // Return the list of {@link Earthquake}s
+        // Return the list of {@link WeatherHour}s
         return hourlyForecasts;
     }
 
     /**
-     * Query the USGS dataset and return a list of {@link WeatherHour} objects.
+     * Query the openweathermap dataset and return a list of {@link WeatherHour} objects.
      */
     public static WeatherDay fetchDailyForecast(String requestUrl) {
         // Create URL object
@@ -77,10 +77,10 @@ public final class QueryUtils {
             Log.e(LOG_TAG, "Problem making the HTTP request.", e);
         }
 
-        // Extract relevant fields from the JSON response and create a list of {@link Earthquake}s
+        // Extract relevant fields from the JSON response and create a {@link WeatherDay}
         WeatherDay dailyForecast = extractDailyWeatherFromJson(jsonResponse);
 
-        // Return the list of {@link Earthquake}s
+        // Return the {@link WeatherDay}
         return dailyForecast;
     }
 
@@ -94,8 +94,8 @@ public final class QueryUtils {
             return null;
         }
 
-        // Create an empty ArrayList that we can start adding earthquakes to
-        List<WeatherHour> earthquakes = new ArrayList<>();
+        // Create an empty ArrayList that we can start adding {@link WeatherHour}s to
+        List<WeatherHour> hourlyForecast = new ArrayList<>();
 
         // Try to parse the JSON response string. If there's a problem with the way the JSON
         // is formatted, a JSONException exception object will be thrown.
@@ -106,37 +106,37 @@ public final class QueryUtils {
             JSONObject baseJsonResponse = new JSONObject(hourlyForecastJSON);
 
             // Extract the JSONArray associated with the key called "features",
-            // which represents a list of features (or earthquakes).
+            // which represents a list of features (or weatherhours).
             JSONArray weatherHourArray = baseJsonResponse.getJSONArray("data");
 
-            // For each earthquake in the earthquakeArray, create an {@link Earthquake} object
+            // For each weatherhour in the weatherhourArray, create an {@link WeatherHour} object
             for (int i = 0; i < weatherHourArray.length(); i++) {
 
-                // Get a single earthquake at position i within the list of earthquakes
+                // Get a single weatherhours at position i within the list of weatherhours
                 JSONObject currentHour = weatherHourArray.getJSONObject(i);
 
                 JSONObject weatherCode = currentHour.getJSONObject("weather");
 
-                // Extract the value for the key called "mag"
+                // Extract the values for the keys called "temp" and "app_temp"
                 double temperature = currentHour.getDouble("temp");
                 double feels_like = currentHour.getDouble("app_temp");
 
-                // Extract the value for the key called "place"
+                // Extract the value for the key called "timestamp_local"
                 String date_time = currentHour.getString("timestamp_local");
 
-                // Extract the value for the key called "time"
+                // Extract the value for the key called "icon"
                 String icon_code = weatherCode.getString("icon");
 
-                // Extract the value for the key called "url"
+                // Extract the value for the key called "description"
                 String description = weatherCode.getString("description");
 
-                // Create a new {@link Earthquake} object with the magnitude, location, time,
-                // and url from the JSON response.
-                WeatherHour hourlyForecast = new WeatherHour(date_time, icon_code, description,
+                // Create a new {@link WeatherHour} object with the date_time, icon_code, description,
+                // temperature, and feels_like from the JSON response.
+                WeatherHour hoursForecast = new WeatherHour(date_time, icon_code, description,
                         temperature, feels_like);
 
-                // Add the new {@link Earthquake} to the list of earthquakes.
-                earthquakes.add(hourlyForecast);
+                // Add the new {@link WeatherHour} to the list of {@link WeatherHour}s.
+                hourlyForecast.add(hoursForecast);
             }
 
         } catch (JSONException e) {
@@ -146,12 +146,12 @@ public final class QueryUtils {
             Log.e("QueryUtils", "Problem parsing the hourly weather JSON results", e);
         }
 
-        // Return the list of earthquakes
-        return earthquakes;
+        // Return the hourly forecast list
+        return hourlyForecast;
     }
 
     /**
-     * Return a list of {@link WeatherHour} objects that has been built up from
+     * Return a {@link WeatherDay} object that has been built up from
      * parsing the given JSON response.
      */
     private static WeatherDay extractDailyWeatherFromJson(String dailyForecastJSON) {
@@ -160,7 +160,7 @@ public final class QueryUtils {
             return null;
         }
 
-        // Create an empty ArrayList that we can start adding earthquakes to
+        // Create an empty WeatherDay
         WeatherDay dailyForecast = null;
 
         // Try to parse the JSON response string. If there's a problem with the way the JSON
@@ -172,7 +172,7 @@ public final class QueryUtils {
             JSONObject baseJsonResponse = new JSONObject(dailyForecastJSON);
 
             // Extract the JSONArray associated with the key called "features",
-            // which represents a list of features (or earthquakes).
+            // which represents a list of features.
             JSONObject weather = baseJsonResponse.getJSONArray("data").getJSONObject(0);
             JSONObject weatherCode = weather.getJSONObject("weather");
 
@@ -180,17 +180,17 @@ public final class QueryUtils {
             double high_temp = weather.getDouble("max_temp");
             double low_temp = weather.getDouble("min_temp");
 
-            // Extract the value for the key called "place"
+            // Extract the value for the key called "datetime"
             String date_time = weather.getString("datetime");
 
-            // Extract the value for the key called "time"
+            // Extract the value for the key called "icon"
             String icon_code = weatherCode.getString("icon");
 
-            // Extract the value for the key called "url"
+            // Extract the value for the key called "description"
             String description = weatherCode.getString("description");
 
-            // Create a new {@link Earthquake} object with the magnitude, location, time,
-            // and url from the JSON response.
+            // Create a new {@link WeatherDay} object with the date_time, icon_code, description,
+            // high_temp, and low_temp from the JSON response.
             dailyForecast = new WeatherDay(date_time, icon_code, description,
                     high_temp, low_temp);
 
@@ -201,7 +201,7 @@ public final class QueryUtils {
             Log.e("QueryUtils", "Problem parsing the weather JSON results", e);
         }
 
-        // Return the list of earthquakes
+        // Return daily forecast
         return dailyForecast;
     }
 
@@ -247,7 +247,7 @@ public final class QueryUtils {
                 Log.e(LOG_TAG, "Error response code: " + urlConnection.getResponseCode());
             }
         } catch (IOException e) {
-            Log.e(LOG_TAG, "Problem retrieving the earthquake JSON results.", e);
+            Log.e(LOG_TAG, "Problem retrieving the hourly forecast JSON results.", e);
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();

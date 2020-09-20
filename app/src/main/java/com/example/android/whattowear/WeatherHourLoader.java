@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
-import java.net.URL;
 import java.util.List;
 
 public class WeatherHourLoader extends AsyncTaskLoader<List<WeatherHour>> {
@@ -41,7 +40,7 @@ public class WeatherHourLoader extends AsyncTaskLoader<List<WeatherHour>> {
             return null;
         }
 
-        // Perform the network request, parse the response, and extract a list of earthquakes.
+        // Perform the network request, parse the response, and extract a list of hour forecasts.
         List<WeatherHour> hourlyforecasts = QueryUtils.fetchHourlyForecast(mUrl);
         return hourlyforecasts;
     }

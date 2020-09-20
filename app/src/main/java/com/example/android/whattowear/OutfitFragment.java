@@ -1,27 +1,18 @@
 package com.example.android.whattowear;
 
 
-import android.app.Activity;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -36,9 +27,7 @@ import android.widget.TextView;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.List;
 
-import com.example.android.whattowear.data.ClothesContract.ClothesEntry;
 import com.example.android.whattowear.data.ClothesProvider;
 
 
@@ -214,6 +203,7 @@ public class OutfitFragment extends Fragment {
 
         // populate outfit recommendations TODO
         mEmptyOutfitView = rootView.findViewById(R.id.empty_outfit_view);
+        mEmptyOutfitView.setVisibility(View.VISIBLE);
         outfitListView.setEmptyView(mEmptyOutfitView);
 
         // Create a new adapter that takes an empty list of outfits as input

@@ -10,11 +10,11 @@ import android.content.Intent;
 import android.content.Loader;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.provider.UserDictionary;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.ContextCompat;
@@ -27,17 +27,16 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
+import android.content.Context;
 
 import com.example.android.whattowear.data.ClothesContract.ClothesEntry;
-import com.example.android.whattowear.R;
 
-import java.net.URI;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 
 /**
  * Allows user to create a new pet or edit an existing one.
@@ -72,10 +71,12 @@ public class EditorActivity extends AppCompatActivity implements
 
     private ImageButton mImageButton;
 
-    private String m_currentImagePath;
+    private Bitmap m_currentBitmap;
 
-    private static int RESULT_LOAD_IMAGE = 1;
+    private static final int REQUEST_IMAGE_CAPTURE = 0;
+    private static final int REQUEST_LOAD_IMAGE = 1;
 
+    private static final int MY_PERMISSIONS_REQUEST_CAMERA = 0;
     private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1;
 
     /**
@@ -103,6 +104,52 @@ public class EditorActivity extends AppCompatActivity implements
             return false;
         }
     };
+
+    private void selectImage(Context context) {
+        final CharSequence[] options = { "Take Photo", "Choose from Gallery" };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Add Image of Clothing Item");
+
+        builder.setItems(options, new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+
+                if (options[item].equals("Take Photo")) {
+
+                    // check if camera permissions exist, request if needed, take photo if granted
+                    if (ContextCompat.checkSelfPermission(EditorActivity.this,
+                            Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+
+                        ActivityCompat.requestPermissions(EditorActivity.this,
+                                new String[]{Manifest.permission.CAMERA},
+                                MY_PERMISSIONS_REQUEST_CAMERA);
+                    } else {
+                        Intent takePicture = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                        startActivityForResult(takePicture, REQUEST_IMAGE_CAPTURE);
+                    }
+
+                } else if (options[item].equals("Choose from Gallery")) {
+
+                    // check if external storage permissions exist, request if needed, open image gallery if granted
+                    if (ContextCompat.checkSelfPermission(EditorActivity.this,
+                            Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+                        ActivityCompat.requestPermissions(EditorActivity.this,
+                                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                                MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+                    } else {
+                        Intent pickPhoto = new Intent(Intent.ACTION_PICK,
+                                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        startActivityForResult(pickPhoto , REQUEST_LOAD_IMAGE);
+                    }
+                }
+            }
+        });
+        builder.show();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -155,85 +202,91 @@ public class EditorActivity extends AppCompatActivity implements
 
             @Override
             public void onClick(View arg0) {
-
-                Intent i = new Intent(
-                        Intent.ACTION_PICK,
-                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-
-                startActivityForResult(i, RESULT_LOAD_IMAGE);
+                selectImage(EditorActivity.this);
             }
         });
 
         setupSpinner();
     }
 
+    public static byte[] getBitmapAsByteArray(Bitmap bitmap) {
+        if (bitmap == null)
+        {
+            return null;
+        }
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
+        return outputStream.toByteArray();
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
-            Uri selectedImage = data.getData();
-            Log.d(LOG_TAG, selectedImage.toString());
-            String[] filePathColumn = { MediaStore.Images.Media.DATA };
+        if (resultCode != RESULT_CANCELED) {
+            switch (requestCode) {
+                case REQUEST_IMAGE_CAPTURE:
+                    if (resultCode == RESULT_OK && data != null) {
+                        Bitmap selectedImage = (Bitmap) data.getExtras().get("data");
+                        mImageButton.setImageBitmap(selectedImage);
 
-            Cursor cursor = getContentResolver().query(selectedImage,
-                    filePathColumn, null, null, null);
-            cursor.moveToFirst();
+                        m_currentBitmap = selectedImage;
+                    }
 
-            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String picturePath = cursor.getString(columnIndex);
-            cursor.close();
+                    break;
+                case REQUEST_LOAD_IMAGE:
+                    if (resultCode == RESULT_OK && data != null) {
 
-            // Here, thisActivity is the current activity
-            if (ContextCompat.checkSelfPermission(this,
-                    Manifest.permission.READ_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED) {
+                        Uri selectedImage = data.getData();
+                        String[] filePathColumn = {MediaStore.Images.Media.DATA};
+                        if (selectedImage != null) {
+                            Cursor cursor = getContentResolver().query(selectedImage,
+                                    filePathColumn, null, null, null);
+                            if (cursor != null) {
+                                cursor.moveToFirst();
 
-                // Permission is not granted
-                // Should we show an explanation?
-                if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                        Manifest.permission.READ_CONTACTS)) {
-                    // Show an explanation to the user *asynchronously* -- don't block
-                    // this thread waiting for the user's response! After the user
-                    // sees the explanation, try again to request the permission.
-                } else {
-                    // No explanation needed; request the permission
-                    ActivityCompat.requestPermissions(this,
-                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                            MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+                                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                                String picturePath = cursor.getString(columnIndex);
+                                cursor.close();
 
-                    // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                    // app-defined int constant. The callback method gets the
-                    // result of the request.
-                    mImageButton.setImageBitmap(BitmapFactory.decodeFile(picturePath));
-                }
-            } else {
-                // Permission has already been granted
-                mImageButton.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+                                // Save photo
+                                m_currentBitmap = BitmapFactory.decodeFile(picturePath);
+                                mImageButton.setImageBitmap(m_currentBitmap);
+                            }
+                        }
+                    }
+                    break;
             }
-
-            m_currentImagePath = picturePath;
-            // TODO: update db with image uri
         }
-
-
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String[] permissions, int[] grantResults) {
         switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_CAMERA: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay!
+                    Toast.makeText(this, "camera permission granted", Toast.LENGTH_LONG).show();
+                } else {
+                    // permission denied, boo!
+                    Toast.makeText(this, "camera permission denied", Toast.LENGTH_LONG).show();
+                }
+                break;
+            }
             case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
+                    // permission was granted, yay!
+                    Toast.makeText(this, "image gallery permission granted", Toast.LENGTH_LONG).show();
                 } else {
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
+                    // permission denied, boo!
+                    Toast.makeText(this, "image gallery permission denied", Toast.LENGTH_LONG).show();
                 }
-                return;
+                break;
             }
 
             // other 'case' lines to check for other
@@ -261,8 +314,8 @@ public class EditorActivity extends AppCompatActivity implements
                 if (!TextUtils.isEmpty(selection)) {
                     if (selection.equals(getString(R.string.subcategory_longsleeve))) {
                         mSubcategory = ClothesEntry.SUBCATEGORY_LONGSLEEVE;
-                    } else if (selection.equals(getString(R.string.subcategory_blouse))) {
-                        mSubcategory = ClothesEntry.SUBCATEGORY_BLOUSE;
+                    } else if (selection.equals(getString(R.string.subcategory_formal_shirt))) {
+                        mSubcategory = ClothesEntry.SUBCATEGORY_FORMAL_SHIRT;
                     } else if (selection.equals(getString(R.string.subcategory_casual_pants))) {
                         mSubcategory = ClothesEntry.SUBCATEGORY_CASUAL_PANTS;
                     } else if (selection.equals(getString(R.string.subcategory_shorts))) {
@@ -370,9 +423,10 @@ public class EditorActivity extends AppCompatActivity implements
         values.put(ClothesEntry.COLUMN_ARTICLE_SPANDEX, spandex);
         values.put(ClothesEntry.COLUMN_ARTICLE_WOOL, wool);
 
-        // save image external path to database
-        values.put(ClothesEntry.COLUMN_ARTICLE_IMAGE, m_currentImagePath);
-
+        // save image as blob
+        if (m_currentBitmap != null) {
+            values.put(ClothesEntry.COLUMN_ARTICLE_IMAGE, getBitmapAsByteArray(m_currentBitmap));
+        }
         // TODO: better error reporting
 
         // Determine if this is a new or existing pet by checking if mCurrentPetUri is null or not
@@ -616,7 +670,13 @@ public class EditorActivity extends AppCompatActivity implements
             int spandex = cursor.getInt(spandexColumnIndex);
             int wool = cursor.getInt(woolColumnIndex);
             int weight = cursor.getInt(weightColumnIndex);
-            m_currentImagePath = cursor.getString(imageColumnIndex);
+            byte[] imageByteArray=cursor.getBlob(imageColumnIndex);
+            if (imageByteArray != null && imageByteArray.length > 0)
+            {
+                ByteArrayInputStream imageStream = new ByteArrayInputStream(imageByteArray);
+                m_currentBitmap = BitmapFactory.decodeStream(imageStream);
+            }
+
             // Update the views on the screen with the values from the database
             mSpandexEditText.setText(ClothesEntry.getSubCategoryName(type));
             mCottonEditText.setText(Integer.toString(cotton));
@@ -627,9 +687,9 @@ public class EditorActivity extends AppCompatActivity implements
             mWoolEditText.setText(Integer.toString(wool));
             mWeightEditText.setText(Integer.toString(weight));
             mNameEditText.setText(name);
-            mImageButton.setImageBitmap(BitmapFactory.decodeFile(m_currentImagePath));
-            // Gender is a dropdown spinner, so map the constant value from the database
-            // into one of the dropdown options (0 is Unknown, 1 is Male, 2 is Female).
+            mImageButton.setImageBitmap(m_currentBitmap);
+            // Subcategory is a dropdown spinner, so map the constant value from the database
+            // into one of the dropdown options.
             // Then call setSelection() so that option is displayed on screen as the current selection.
             if (type >=0 || type <= ClothesEntry.SUBCATEGORY_COAT) {
                 mSubCategorySpinner.setSelection(type);

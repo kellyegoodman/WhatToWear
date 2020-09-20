@@ -2,9 +2,12 @@ package com.example.android.whattowear;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.BitmapFactory;
 import android.support.v4.app.LoaderManager;
 import com.example.android.whattowear.Outfit.ClothingItem;
 import com.example.android.whattowear.data.ClothesContract.ClothesEntry;
+
+import java.io.ByteArrayInputStream;
 
 public class OutfitLogic {
     /** Tag for log messages */
@@ -45,7 +48,7 @@ public class OutfitLogic {
         switch (mTag) {
             case FORMAL_TAG:
                 mTopLoaderListener = new ClothesLoader(m_context, this,
-                        new String[]{String.valueOf(ClothesEntry.SUBCATEGORY_BLOUSE)});
+                        new String[]{String.valueOf(ClothesEntry.SUBCATEGORY_FORMAL_SHIRT)});
                 mBottomLoaderListener = new ClothesLoader(m_context, this,
                         new String[] {String.valueOf(ClothesEntry.SUBCATEGORY_SLACKS),
                         String.valueOf(ClothesEntry.SUBCATEGORY_SKIRT)});
@@ -125,7 +128,9 @@ public class OutfitLogic {
         }
 
         mIsLoadingDone = true;
-        mParent.addOutfit(best_outfit);
+        if (!best_outfit.isEmpty() && best_outfit.isValid()) {
+            mParent.addOutfit(best_outfit);
+        }
     }
 
     // TODO: binary search
@@ -146,10 +151,16 @@ public class OutfitLogic {
             }
 
             if (dressCursor.moveToPosition(result_position)) {
-                String imagePath = dressCursor.getString(dressCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE));
+                byte[] imageByteArray = dressCursor.getBlob(dressCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE));
                 double warmth = dressCursor.getDouble(dressCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
 
-                outfit.addItem(new ClothingItem(Outfit.DRESS, imagePath, warmth));
+                if (imageByteArray != null && imageByteArray.length > 0)
+                {
+                    ByteArrayInputStream imageStream = new ByteArrayInputStream(imageByteArray);
+                    outfit.addItem(new ClothingItem(Outfit.DRESS, BitmapFactory.decodeStream(imageStream), warmth));
+                } else {
+                    outfit.addItem(new ClothingItem(Outfit.DRESS, null, warmth));
+                }
             }
         }
         return outfit;
@@ -183,17 +194,30 @@ public class OutfitLogic {
             }
 
             if (topCursor.moveToPosition(result_top_position)) {
-                String imagePath = topCursor.getString(topCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE));
+                byte[] imageByteArray = topCursor.getBlob(topCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE));
                 double warmth = topCursor.getDouble(topCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
 
-                outfit.addItem(new ClothingItem(Outfit.TOP, imagePath, warmth));
+                if (imageByteArray != null && imageByteArray.length > 0)
+                {
+                    ByteArrayInputStream imageStream = new ByteArrayInputStream(imageByteArray);
+                    outfit.addItem(new ClothingItem(Outfit.TOP, BitmapFactory.decodeStream(imageStream), warmth));
+                } else {
+                    outfit.addItem(new ClothingItem(Outfit.TOP, null, warmth));
+                }
+
             }
 
             if (bottomCursor.moveToPosition(result_bottom_position)) {
-                String imagePath = bottomCursor.getString(bottomCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE));
+                byte[] imageByteArray = bottomCursor.getBlob(bottomCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE));
                 double warmth = bottomCursor.getDouble(bottomCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
 
-                outfit.addItem(new ClothingItem(Outfit.BOTTOM, imagePath, warmth));
+                if (imageByteArray != null && imageByteArray.length > 0)
+                {
+                    ByteArrayInputStream imageStream = new ByteArrayInputStream(imageByteArray);
+                    outfit.addItem(new ClothingItem(Outfit.BOTTOM, BitmapFactory.decodeStream(imageStream), warmth));
+                } else {
+                    outfit.addItem(new ClothingItem(Outfit.BOTTOM, null, warmth));
+                }
             }
         }
         return outfit;
@@ -229,10 +253,16 @@ public class OutfitLogic {
             }
 
             if (!best_outfit.isEmpty() && jacketCursor.moveToPosition(result_jacket_position)) {
-                String imagePath = jacketCursor.getString(jacketCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE));
+                byte[] imageByteArray = jacketCursor.getBlob(jacketCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE));
                 double warmth = jacketCursor.getDouble(jacketCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
 
-                best_outfit.addItem(new ClothingItem(Outfit.OUTER1, imagePath, warmth));
+                if (imageByteArray != null && imageByteArray.length > 0)
+                {
+                    ByteArrayInputStream imageStream = new ByteArrayInputStream(imageByteArray);
+                    best_outfit.addItem(new ClothingItem(Outfit.OUTER1, BitmapFactory.decodeStream(imageStream), warmth));
+                } else {
+                    best_outfit.addItem(new ClothingItem(Outfit.OUTER1, null, warmth));
+                }
             }
         }
         return best_outfit;

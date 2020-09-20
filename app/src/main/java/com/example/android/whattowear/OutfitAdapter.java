@@ -1,10 +1,8 @@
 package com.example.android.whattowear;
 
 import android.app.Activity;
-import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,10 +10,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import com.example.android.whattowear.Outfit;
-import com.example.android.whattowear.R;
-import com.example.android.whattowear.WeatherHour;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,30 +55,30 @@ public class OutfitAdapter extends ArrayAdapter<Outfit> {
         LinearLayout.LayoutParams jacket_view_params = (LinearLayout.LayoutParams) jacketWrapper.getLayoutParams();
 
         for (Outfit.ClothingItem item : outfit_list) {
-            if (!TextUtils.isEmpty(item.getImage())) {
+            if (item.getImage() != null) {
                 switch (item.getType()) {
                     case Outfit.TOP:
-                        topView.setImageBitmap(BitmapFactory.decodeFile(item.getImage()));
+                        topView.setImageBitmap(item.getImage());
                         dress_view_params.weight = 0.0f;
                         dressWrapper.setLayoutParams(dress_view_params);
                         top_bottom_view_params.weight = 0.8f;
                         topBottomWrapper.setLayoutParams(top_bottom_view_params);
                         break;
                     case Outfit.DRESS:
-                        dressView.setImageBitmap(BitmapFactory.decodeFile(item.getImage()));
+                        dressView.setImageBitmap(item.getImage());
                         dress_view_params.weight = 0.8f;
                         dressWrapper.setLayoutParams(dress_view_params);
                         top_bottom_view_params.weight = 0.0f;
                         topBottomWrapper.setLayoutParams(top_bottom_view_params);
                         break;
                     case Outfit.OUTER1:
-                        jacketView.setImageBitmap(BitmapFactory.decodeFile(item.getImage()));
+                        jacketView.setImageBitmap(item.getImage());
                         jacket_view_params.weight = 1.0f;
                         jacketWrapper.setLayoutParams(jacket_view_params);
                         break;
                     case Outfit.BOTTOM:
                     default:
-                        bottomView.setImageBitmap(BitmapFactory.decodeFile(item.getImage()));
+                        bottomView.setImageBitmap(item.getImage());
                         break;
                 }
             }
@@ -92,7 +86,7 @@ public class OutfitAdapter extends ArrayAdapter<Outfit> {
 
         TextView summary_view = (TextView) listItemView.findViewById(R.id.outfit_header);
         summary_view.setText(getContext().getString(R.string.outfit_default_text,
-                position+1,currentOutfit.getWarmth(),mDesriedWarmth));
+                position+1));//,currentOutfit.getWarmth(),mDesriedWarmth));
 
         // Return the whole list item layout (containing 3 TextViews)
         // so that it can be shown in the ListView

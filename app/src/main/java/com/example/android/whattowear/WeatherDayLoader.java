@@ -4,12 +4,9 @@ import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
-import java.net.URL;
-import java.util.List;
-
 public class WeatherDayLoader extends AsyncTaskLoader<WeatherDay> {
     /** Tag for log messages */
-    private static final String LOG_TAG = WeatherHourLoader.class.getName();
+    private static final String LOG_TAG = WeatherDayLoader.class.getName();
 
     /** Query URL */
     private String mUrl;
@@ -41,7 +38,7 @@ public class WeatherDayLoader extends AsyncTaskLoader<WeatherDay> {
             return null;
         }
 
-        // Perform the network request, parse the response, and extract a list of earthquakes.
+        // Perform the network request, parse the response, and extract the current day's weather.
         WeatherDay dailyforecast = QueryUtils.fetchDailyForecast(mUrl);
         return dailyforecast;
     }

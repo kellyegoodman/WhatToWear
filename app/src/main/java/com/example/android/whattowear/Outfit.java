@@ -1,5 +1,7 @@
 package com.example.android.whattowear;
 
+import android.graphics.Bitmap;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,17 +15,17 @@ public class Outfit {
 
     public static class ClothingItem {
         private int mType;
-        private String mImagePath;
+        private Bitmap mBitmap;
         private double mWarmth;
 
-        public ClothingItem(int type, String imagePath, double warmth) {
+        public ClothingItem(int type, Bitmap image, double warmth) {
             mType = type;
-            mImagePath = imagePath;
+            mBitmap = image;
             mWarmth = warmth;
         }
 
         public int getType() { return mType; }
-        public String getImage() { return mImagePath; }
+        public Bitmap getImage() { return mBitmap; }
         public double getWarmth() { return mWarmth; }
     }
 

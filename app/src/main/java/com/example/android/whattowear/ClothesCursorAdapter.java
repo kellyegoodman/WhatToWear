@@ -11,11 +11,9 @@ import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.android.whattowear.data.ClothesContract;
 import com.example.android.whattowear.data.ClothesContract.ClothesEntry;
-import com.example.android.whattowear.R;
 
-import org.w3c.dom.Text;
+import java.io.ByteArrayInputStream;
 
 /**
  * {@link ClothesCursorAdapter} is an adapter for a list or grid view
@@ -70,7 +68,8 @@ public class ClothesCursorAdapter extends CursorAdapter {
         Integer itemSubCategory = cursor.getInt(cursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_SUBCATEGORY));
         String itemName = cursor.getString(cursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_NAME));
         Double itemWarmth = cursor.getDouble(cursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
-        String picturePath = cursor.getString(cursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE));
+
+        byte[] imageByteArray=cursor.getBlob(cursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE));
 
         // If the item name is empty string or null, then use some default text
         // that says " ", so the TextView isn't blank.
@@ -85,8 +84,11 @@ public class ClothesCursorAdapter extends CursorAdapter {
         double roundOff = (double) Math.round(itemWarmth * 100) / 100;
         warmthView.setText(Double.toString(roundOff));
 
-        if (!TextUtils.isEmpty(picturePath)) {
-            imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+        if (imageByteArray != null && imageByteArray.length > 0)
+        {
+            ByteArrayInputStream imageStream = new ByteArrayInputStream(imageByteArray);
+            imageView.setImageBitmap(BitmapFactory.decodeStream(imageStream));
         }
+
     }
 }

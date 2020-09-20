@@ -170,7 +170,7 @@ public final class ClothesContract {
          */
         public static final int SUBCATEGORY_TSHIRT = 0;
         public static final int SUBCATEGORY_LONGSLEEVE = 1;
-        public static final int SUBCATEGORY_BLOUSE = 2;
+        public static final int SUBCATEGORY_FORMAL_SHIRT = 2;
         public static final int SUBCATEGORY_CASUAL_PANTS = 3;
         public static final int SUBCATEGORY_SHORTS = 4;
         public static final int SUBCATEGORY_SLACKS = 5;
@@ -190,8 +190,8 @@ public final class ClothesContract {
                     return "T Shirt";
                 case SUBCATEGORY_LONGSLEEVE:
                     return "Longsleeve Shirt";
-                case SUBCATEGORY_BLOUSE:
-                    return "Blouse";
+                case SUBCATEGORY_FORMAL_SHIRT:
+                    return "Formal Shirt";
                 case SUBCATEGORY_CASUAL_PANTS:
                     return "Pants";
                 case SUBCATEGORY_SHORTS:
@@ -227,7 +227,7 @@ public final class ClothesContract {
             Map<Integer, Integer> aMap = new HashMap<Integer, Integer>();
             aMap.put(SUBCATEGORY_TSHIRT, CATEGORY_TOP);
             aMap.put(SUBCATEGORY_LONGSLEEVE, CATEGORY_TOP);
-            aMap.put(SUBCATEGORY_BLOUSE, CATEGORY_TOP);
+            aMap.put(SUBCATEGORY_FORMAL_SHIRT, CATEGORY_TOP);
             aMap.put(SUBCATEGORY_CASUAL_PANTS, CATEGORY_BOTTOM);
             aMap.put(SUBCATEGORY_SHORTS, CATEGORY_BOTTOM);
             aMap.put(SUBCATEGORY_SLACKS, CATEGORY_BOTTOM);

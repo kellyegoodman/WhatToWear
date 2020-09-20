@@ -30,7 +30,7 @@
             android:label="@string/settings_title">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.android.whattowear.MainActivity" />
+                android:value=".MainActivity" />
         </activity>
 
         <provider

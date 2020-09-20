@@ -14,7 +14,7 @@
     <string-array name="array_subcategory_options">
         <item>@string/subcategory_tshirt</item>
         <item>@string/subcategory_longsleeve</item>
-        <item>@string/subcategory_blouse</item>
+        <item>@string/subcategory_formal_shirt</item>
         <item>@string/subcategory_casual_pants</item>
         <item>@string/subcategory_shorts</item>
         <item>@string/subcategory_slacks</item>

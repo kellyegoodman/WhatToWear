@@ -5,7 +5,9 @@
 
     <string name="weather_summary_title">Today\'s Weather</string>
 
-    <string name="outfit_default_text">Outfit %d: W=%.1f, W_desired=%.1f</string>
+    <string name="outfit_default_text">Outfit %d</string>
+
+    <string name="outfit_debug_text">Outfit %d: W=%.1f, W_desired=%.1f</string>
 
     <string name="page_outfit_recommendations">Outfits</string>
 
@@ -26,10 +28,10 @@
     <string name="empty_catalog_title_text">It\'s a bit lonely here...</string>
 
     <!-- Title text for the empty view, which describes the empty wardrobe image [CHAR LIMIT=50] -->
-    <string name="empty_outfit_title_text">You don\'t have any clothes!</string>
+    <string name="empty_outfit_title_text">You don\'t have enough clothes!</string>
 
     <!-- Subtitle text for the empty view that prompts the user to add a clothing item [CHAR LIMIT=50] -->
-    <string name="empty_view_subtitle_text">Get started by adding some clothes</string>
+    <string name="empty_view_subtitle_text">Get started by adding some clothes in the next tab.</string>
 
     <!-- Label for overflow menu option that launches intent to edit settings in the app [CHAR LIMIT=20] -->
     <string name="action_edit_settings">Settings</string>
@@ -141,7 +143,7 @@
     <!-- Label for dropdown menu option if the pet's gender is unknown [CHAR LIMIT=20] -->
     <string name="subcategory_longsleeve">Longsleeve Shirt</string>
     <!-- Label for dropdown menu option if the pet's gender is unknown [CHAR LIMIT=20] -->
-    <string name="subcategory_blouse">Blouse</string>
+    <string name="subcategory_formal_shirt">Formal Shirt</string>
     <!-- Label for dropdown menu option if the pet's gender is unknown [CHAR LIMIT=20] -->
     <string name="subcategory_casual_pants">Casual Pants</string>
     <!-- Label for dropdown menu option if the pet's gender is unknown [CHAR LIMIT=20] -->

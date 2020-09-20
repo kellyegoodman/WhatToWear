@@ -33,8 +33,6 @@ public class PageAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         if (position == 0) {
             return new OutfitFragment();
-        } else if (position == 1) {
-            return new WeatherFragment();
         } else {
             return new CatalogFragment();
         }
@@ -45,7 +43,7 @@ public class PageAdapter extends FragmentPagerAdapter {
      */
     @Override
     public int getCount() {
-        return 3;
+        return 2;
     }
 
     @Nullable
@@ -53,8 +51,6 @@ public class PageAdapter extends FragmentPagerAdapter {
     public CharSequence getPageTitle(int position) {
         if (position == 0) {
             return mContext.getString(R.string.page_outfit_recommendations);
-        } else if (position == 1) {
-            return mContext.getString(R.string.page_weather);
         } else {
             return mContext.getString(R.string.page_catalog);
         }
