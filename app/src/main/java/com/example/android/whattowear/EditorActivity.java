@@ -14,6 +14,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NavUtils;
@@ -33,10 +34,16 @@ import android.widget.Spinner;
 import android.widget.Toast;
 import android.content.Context;
 
+import com.github.gabrielbb.cutout.CutOut;
+
 import com.example.android.whattowear.data.ClothesContract.ClothesEntry;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Allows user to create a new pet or edit an existing one.
@@ -46,7 +53,7 @@ import java.io.ByteArrayOutputStream;
  */
 public class EditorActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor> {
-    /** Identifier for the pet data loader */
+    /** Identifier for the item data loader */
     private static final int EXISTING_CLOTHING_LOADER = 0;
     /** Content URI for the existing pet (null if it's a new pet) */
     private Uri mCurrentItemUri;
@@ -72,6 +79,7 @@ public class EditorActivity extends AppCompatActivity implements
     private ImageButton mImageButton;
 
     private Bitmap m_currentBitmap;
+    private Uri mimageUri;
 
     private static final int REQUEST_IMAGE_CAPTURE = 0;
     private static final int REQUEST_LOAD_IMAGE = 1;
@@ -126,8 +134,22 @@ public class EditorActivity extends AppCompatActivity implements
                                 new String[]{Manifest.permission.CAMERA},
                                 MY_PERMISSIONS_REQUEST_CAMERA);
                     } else {
-                        Intent takePicture = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                        startActivityForResult(takePicture, REQUEST_IMAGE_CAPTURE);
+                        // permissions already granted, take photo
+                        try {
+                            // set up temporary uri
+                            ContentValues values = new ContentValues();
+                            values.put(MediaStore.Images.Media.TITLE, "New Picture");
+                            values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
+                            mimageUri = getContentResolver().insert(
+                                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+                            Intent takePicture = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                            takePicture.putExtra(MediaStore.EXTRA_OUTPUT, mimageUri);
+                            startActivityForResult(takePicture, REQUEST_IMAGE_CAPTURE);
+
+                        } catch (Exception e) {
+                            Log.e(LOG_TAG, "Problem launching camera", e);
+                        }
                     }
 
                 } else if (options[item].equals("Choose from Gallery")) {
@@ -161,16 +183,16 @@ public class EditorActivity extends AppCompatActivity implements
         // If the intent DOES NOT contain a pet content URI, then we know that we are
         // creating a new pet.
         if (mCurrentItemUri == null) {
-            // This is a new pet, so change the app bar to say "Add an Item"
+            // This is a new item, so change the app bar to say "Add an Item"
             setTitle(getString(R.string.editor_activity_title_new_item));
 
             // Invalidate the options menu, so the "Delete" menu option can be hidden.
             // (It doesn't make sense to delete a pet that hasn't been created yet.)
             invalidateOptionsMenu();
         } else {
-            // Otherwise this is an existing pet, so change app bar to say "Edit Item"
+            // Otherwise this is an existing item, so change app bar to say "Edit Item"
             setTitle(getString(R.string.editor_activity_title_edit_item));
-            // Initialize a loader to read the pet data from the database
+            // Initialize a loader to read the item data from the database
             // and display the current values in the editor
             getLoaderManager().initLoader(EXISTING_CLOTHING_LOADER, null, this);
         }
@@ -226,33 +248,41 @@ public class EditorActivity extends AppCompatActivity implements
         if (resultCode != RESULT_CANCELED) {
             switch (requestCode) {
                 case REQUEST_IMAGE_CAPTURE:
-                    if (resultCode == RESULT_OK && data != null) {
-                        Bitmap selectedImage = (Bitmap) data.getExtras().get("data");
-                        mImageButton.setImageBitmap(selectedImage);
+                    // data is null when uri is passed to camera intent
+                    // ignore data and use the saved image uri
+                    if (resultCode == RESULT_OK) {  // && data != null
 
-                        m_currentBitmap = selectedImage;
+                        // modify picture
+                        CutOut.activity()
+                                .src(mimageUri)
+                                .bordered()
+                                .start(this);
                     }
-
                     break;
                 case REQUEST_LOAD_IMAGE:
                     if (resultCode == RESULT_OK && data != null) {
 
                         Uri selectedImage = data.getData();
-                        String[] filePathColumn = {MediaStore.Images.Media.DATA};
-                        if (selectedImage != null) {
-                            Cursor cursor = getContentResolver().query(selectedImage,
-                                    filePathColumn, null, null, null);
-                            if (cursor != null) {
-                                cursor.moveToFirst();
 
-                                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                                String picturePath = cursor.getString(columnIndex);
-                                cursor.close();
-
-                                // Save photo
-                                m_currentBitmap = BitmapFactory.decodeFile(picturePath);
-                                mImageButton.setImageBitmap(m_currentBitmap);
-                            }
+                        // modify picture
+                        CutOut.activity()
+                                .src(selectedImage)
+                                .bordered()
+                                .start(this);
+                    }
+                    break;
+                case CutOut.CUTOUT_ACTIVITY_REQUEST_CODE:
+                    if (resultCode == RESULT_OK && data != null) {
+                        try
+                        {
+                            // try to save the stripped image
+                            Uri imageUri = CutOut.getUri(data);
+                            m_currentBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+                            mImageButton.setImageBitmap(m_currentBitmap);
+                        }
+                        catch (Exception ex)
+                        {
+                            Toast.makeText(this, "problem getting editted photo!", Toast.LENGTH_LONG).show();
                         }
                     }
                     break;
