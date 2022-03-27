@@ -24,7 +24,7 @@ import java.util.List;
  */
 public final class QueryUtils {
 
-    public static final String API_KEY = "f094684ee2f4472eb7a5c2d423fa484d";
+    public static final String API_KEY = "05a060896ba8459ba335ab58c786ab4c";
 
     /** URL for hourly weather data from the openweathermap dataset */
     public static final String WEATHER_BIT_REQUEST_URL = "https://api.weatherbit.io/v2.0/forecast";
