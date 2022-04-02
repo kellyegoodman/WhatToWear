@@ -17,7 +17,7 @@ public class ClothesDbHelper extends SQLiteOpenHelper {
     /**
      * Database version. If you change the database schema, you must increment the database version.
      */
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     /**
      * Constructs a new instance of {@link ClothesDbHelper}.
@@ -44,10 +44,9 @@ public class ClothesDbHelper extends SQLiteOpenHelper {
                 + ClothesEntry.COLUMN_ARTICLE_COTTON + " INTEGER NOT NULL DEFAULT 0, "
                 + ClothesEntry.COLUMN_ARTICLE_POLYESTER + " INTEGER NOT NULL DEFAULT 0, "
                 + ClothesEntry.COLUMN_ARTICLE_RAYON + " INTEGER NOT NULL DEFAULT 0, "
-                + ClothesEntry.COLUMN_ARTICLE_NYLON + " INTEGER NOT NULL DEFAULT 0, "
-                + ClothesEntry.COLUMN_ARTICLE_SPANDEX + " INTEGER NOT NULL DEFAULT 0, "
+                + ClothesEntry.COLUMN_ARTICLE_NYLON_SPANDEX + " INTEGER NOT NULL DEFAULT 0, "
                 + ClothesEntry.COLUMN_ARTICLE_WOOL + " INTEGER NOT NULL DEFAULT 0, "
-                + ClothesEntry.COLUMN_ARTICLE_WARMTH + " REAL NOT NULL DEFAULT 0);";
+                + ClothesEntry.COLUMN_ARTICLE_CLO_VALUE + " REAL NOT NULL DEFAULT 0);";
 
         // Execute the SQL statement
         db.execSQL(SQL_CREATE_CLOTHES_TABLE);

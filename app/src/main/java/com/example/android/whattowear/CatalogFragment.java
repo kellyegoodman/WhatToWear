@@ -109,8 +109,7 @@ public class CatalogFragment extends Fragment
         values.put(ClothesEntry.COLUMN_ARTICLE_COTTON, 100);
         values.put(ClothesEntry.COLUMN_ARTICLE_POLYESTER, 0);
         values.put(ClothesEntry.COLUMN_ARTICLE_RAYON, 0);
-        values.put(ClothesEntry.COLUMN_ARTICLE_NYLON, 0);
-        values.put(ClothesEntry.COLUMN_ARTICLE_SPANDEX, 0);
+        values.put(ClothesEntry.COLUMN_ARTICLE_NYLON_SPANDEX, 0);
         values.put(ClothesEntry.COLUMN_ARTICLE_WOOL, 0);
 
         // Insert a new row for Toto in the database, returning the ID of that new row.
@@ -163,7 +162,7 @@ public class CatalogFragment extends Fragment
                 ClothesEntry.COLUMN_ARTICLE_SUBCATEGORY,
                 ClothesEntry.COLUMN_ARTICLE_NAME,
                 ClothesEntry.COLUMN_ARTICLE_IMAGE,
-                ClothesEntry.COLUMN_ARTICLE_WARMTH};
+                ClothesEntry.COLUMN_ARTICLE_CLO_VALUE};
 
         // This loader will execute the ContentProvider's query method on a background thread
         return new CursorLoader(getActivity(),    // Parent activity's context

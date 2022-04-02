@@ -27,8 +27,8 @@ public class OutfitLogic {
 
     private int mTasksLeft;
     private boolean mIsLoadingDone;
-    private boolean mHasWarmthRequest;
-    private double mWarmthRequest;
+    private boolean mHasCloRequest;
+    private double mCloRequest;
 
     /** Loaders for the different clothing categories */
     private ClothesLoader mTopLoaderListener;
@@ -41,7 +41,7 @@ public class OutfitLogic {
         mParent = parent;
         mTag = tag;
         mTasksLeft = 4;
-        mHasWarmthRequest = false;
+        mHasCloRequest = false;
         mIsLoadingDone = false;
 
         // construct category loaders
@@ -73,7 +73,8 @@ public class OutfitLogic {
                 mOuterLoaderListener = new ClothesLoader(m_context, this,
                         new String[] {String.valueOf(ClothesEntry.SUBCATEGORY_HOODIE),
                         String.valueOf(ClothesEntry.SUBCATEGORY_SWEATER),
-                        String.valueOf(ClothesEntry.SUBCATEGORY_JACKET)});
+                        String.valueOf(ClothesEntry.SUBCATEGORY_JACKET),
+                        String.valueOf(ClothesEntry.SUBCATEGORY_COAT)});
         }
 
         // run the category querys
@@ -83,11 +84,11 @@ public class OutfitLogic {
         loaderManager.initLoader(tag + DRESS_LOADER_ID, null, mDressLoaderListener);
     }
 
-    /** This sets the requested warmth, if this is the last async task to completed, launch
+    /** This sets the requested clo value, if this is the last async task to completed, launch
      * the outfit logic */
-    public void FetchOutfit(double warmth_request) {
-        mWarmthRequest = warmth_request;
-        mHasWarmthRequest = true;
+    public void FetchOutfit(double clo_value_request) {
+        mCloRequest = clo_value_request;
+        mHasCloRequest = true;
         if (mTasksLeft==0){
             onAllTasksCompleted();
         }
@@ -96,7 +97,7 @@ public class OutfitLogic {
     /** Callback to keep track of how many category loaders have finished loading */
     public void taskComplete() {
         mTasksLeft--;
-        if ((mTasksLeft==0) & mHasWarmthRequest){
+        if ((mTasksLeft==0) & mHasCloRequest){
             onAllTasksCompleted();
         }
     }
@@ -110,21 +111,21 @@ public class OutfitLogic {
 
         Outfit temp;
         // get best top, bottom combo
-        Outfit best_outfit = getBestTopBottom(mWarmthRequest);
-        double diff = Math.abs(mWarmthRequest - best_outfit.getWarmth());
+        Outfit best_outfit = getBestTopBottom(mCloRequest);
+        double diff = Math.abs(mCloRequest - best_outfit.getCloValue());
 
         // get best dress
-        temp = getBestDress(mWarmthRequest);
-        if (best_outfit.isEmpty() || (!temp.isEmpty() && (Math.abs(mWarmthRequest - temp.getWarmth()) < diff))) {
+        temp = getBestDress(mCloRequest);
+        if (best_outfit.isEmpty() || (!temp.isEmpty() && (Math.abs(mCloRequest - temp.getCloValue()) < diff))) {
             best_outfit = temp;
-            diff = Math.abs(mWarmthRequest - temp.getWarmth());
+            diff = Math.abs(mCloRequest - temp.getCloValue());
         }
 
         // get best jacket outfit
-        temp= getBestWithJacket(mWarmthRequest);
-        if (best_outfit.isEmpty() || (!temp.isEmpty() && (Math.abs(mWarmthRequest - temp.getWarmth()) < diff))) {
+        temp= getBestWithJacket(mCloRequest);
+        if (best_outfit.isEmpty() || (!temp.isEmpty() && (Math.abs(mCloRequest - temp.getCloValue()) < diff))) {
             best_outfit = temp;
-            diff = Math.abs(mWarmthRequest - temp.getWarmth());
+            diff = Math.abs(mCloRequest - temp.getCloValue());
         }
 
         mIsLoadingDone = true;
@@ -134,17 +135,17 @@ public class OutfitLogic {
     }
 
     // TODO: binary search
-    private Outfit getBestDress(double desired_sum) {
+    private Outfit getBestDress(double desired_clo) {
         Cursor dressCursor = mDressLoaderListener.getCursor();
         Outfit outfit = new Outfit();
         double diff = Double.MAX_VALUE;
         int result_position = 0;
-        double dress_warmth;
+        double dress_clo;
         if (dressCursor.moveToFirst()) {
             while (!dressCursor.isAfterLast()) {
-                dress_warmth = dressCursor.getDouble(dressCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
-                if (Math.abs(dress_warmth - desired_sum) < diff) {
-                    diff = Math.abs(dress_warmth - desired_sum);
+                dress_clo = dressCursor.getDouble(dressCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_CLO_VALUE));
+                if (Math.abs(dress_clo - desired_clo) < diff) {
+                    diff = Math.abs(dress_clo - desired_clo);
                     result_position = dressCursor.getPosition();
                 }
                 dressCursor.moveToNext();
@@ -152,41 +153,41 @@ public class OutfitLogic {
 
             if (dressCursor.moveToPosition(result_position)) {
                 byte[] imageByteArray = dressCursor.getBlob(dressCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE));
-                double warmth = dressCursor.getDouble(dressCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
+                double clo = dressCursor.getDouble(dressCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_CLO_VALUE));
 
                 if (imageByteArray != null && imageByteArray.length > 0)
                 {
                     ByteArrayInputStream imageStream = new ByteArrayInputStream(imageByteArray);
-                    outfit.addItem(new ClothingItem(Outfit.DRESS, BitmapFactory.decodeStream(imageStream), warmth));
+                    outfit.addItem(new ClothingItem(Outfit.DRESS, BitmapFactory.decodeStream(imageStream), clo));
                 } else {
-                    outfit.addItem(new ClothingItem(Outfit.DRESS, null, warmth));
+                    outfit.addItem(new ClothingItem(Outfit.DRESS, null, clo));
                 }
             }
         }
         return outfit;
     }
-    private Outfit getBestTopBottom(double desired_sum) {
+    private Outfit getBestTopBottom(double desired_clo) {
         Cursor topCursor = mTopLoaderListener.getCursor();
         Cursor bottomCursor = mBottomLoaderListener.getCursor();
         Outfit outfit = new Outfit();
         double diff = Double.MAX_VALUE;
         int result_top_position = 0;
         int result_bottom_position = 0;
-        double top_warmth;
-        double bottom_warmth;
+        double top_clo;
+        double bottom_clo;
         if (topCursor.moveToFirst() && bottomCursor.moveToLast()) {
             while (!topCursor.isAfterLast() && !bottomCursor.isBeforeFirst()) {
                 // if this combo is closer to desired, update result
-                top_warmth = topCursor.getDouble(topCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
-                bottom_warmth = bottomCursor.getDouble(bottomCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
-                if (Math.abs(top_warmth + bottom_warmth - desired_sum) < diff) {
-                    diff = Math.abs(top_warmth + bottom_warmth - desired_sum);
+                top_clo = topCursor.getDouble(topCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_CLO_VALUE));
+                bottom_clo = bottomCursor.getDouble(bottomCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_CLO_VALUE));
+                if (Math.abs(top_clo + bottom_clo - desired_clo) < diff) {
+                    diff = Math.abs(top_clo + bottom_clo - desired_clo);
                     result_top_position = topCursor.getPosition();
                     result_bottom_position = bottomCursor.getPosition();
                 }
 
                 // shift next check based on whether this combo is greater than or less than desired
-                if (top_warmth + bottom_warmth < desired_sum) {
+                if (top_clo + bottom_clo < desired_clo) {
                     topCursor.moveToNext();
                 } else {
                     bottomCursor.moveToPrevious();
@@ -195,28 +196,28 @@ public class OutfitLogic {
 
             if (topCursor.moveToPosition(result_top_position)) {
                 byte[] imageByteArray = topCursor.getBlob(topCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE));
-                double warmth = topCursor.getDouble(topCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
+                double clo = topCursor.getDouble(topCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_CLO_VALUE));
 
                 if (imageByteArray != null && imageByteArray.length > 0)
                 {
                     ByteArrayInputStream imageStream = new ByteArrayInputStream(imageByteArray);
-                    outfit.addItem(new ClothingItem(Outfit.TOP, BitmapFactory.decodeStream(imageStream), warmth));
+                    outfit.addItem(new ClothingItem(Outfit.TOP, BitmapFactory.decodeStream(imageStream), clo));
                 } else {
-                    outfit.addItem(new ClothingItem(Outfit.TOP, null, warmth));
+                    outfit.addItem(new ClothingItem(Outfit.TOP, null, clo));
                 }
 
             }
 
             if (bottomCursor.moveToPosition(result_bottom_position)) {
                 byte[] imageByteArray = bottomCursor.getBlob(bottomCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE));
-                double warmth = bottomCursor.getDouble(bottomCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
+                double clo = bottomCursor.getDouble(bottomCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_CLO_VALUE));
 
                 if (imageByteArray != null && imageByteArray.length > 0)
                 {
                     ByteArrayInputStream imageStream = new ByteArrayInputStream(imageByteArray);
-                    outfit.addItem(new ClothingItem(Outfit.BOTTOM, BitmapFactory.decodeStream(imageStream), warmth));
+                    outfit.addItem(new ClothingItem(Outfit.BOTTOM, BitmapFactory.decodeStream(imageStream), clo));
                 } else {
-                    outfit.addItem(new ClothingItem(Outfit.BOTTOM, null, warmth));
+                    outfit.addItem(new ClothingItem(Outfit.BOTTOM, null, clo));
                 }
             }
         }
@@ -224,27 +225,27 @@ public class OutfitLogic {
     }
 
     // O(n^2) need to optimize
-    private Outfit getBestWithJacket(double desired_sum) {
+    private Outfit getBestWithJacket(double desired_clo) {
         Cursor jacketCursor = mOuterLoaderListener.getCursor();
         Outfit best_outfit = new Outfit();
         Outfit temp_top_bottom;
         Outfit temp_dress;
         double diff = Double.MAX_VALUE;
-        double jacket_warmth = 0;
+        double jacket_clo = 0;
         int result_jacket_position = 0;
         if (jacketCursor.moveToFirst()) {
             while (!jacketCursor.isAfterLast()) {
-                jacket_warmth = jacketCursor.getDouble(jacketCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
-                temp_top_bottom = getBestTopBottom(desired_sum - jacket_warmth);
-                temp_dress = getBestDress(desired_sum - jacket_warmth);
+                jacket_clo = jacketCursor.getDouble(jacketCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_CLO_VALUE));
+                temp_top_bottom = getBestTopBottom(desired_clo - jacket_clo);
+                temp_dress = getBestDress(desired_clo - jacket_clo);
 
-                if (Math.abs(temp_top_bottom.getWarmth() + jacket_warmth - desired_sum) < diff) {
-                    diff = Math.abs(temp_top_bottom.getWarmth() + jacket_warmth - desired_sum);
+                if (Math.abs(temp_top_bottom.getCloValue() + jacket_clo - desired_clo) < diff) {
+                    diff = Math.abs(temp_top_bottom.getCloValue() + jacket_clo - desired_clo);
                     result_jacket_position = jacketCursor.getPosition();
                     best_outfit = temp_top_bottom;
                 }
-                if (Math.abs(temp_dress.getWarmth() + jacket_warmth - desired_sum) < diff) {
-                    diff = Math.abs(temp_dress.getWarmth() + jacket_warmth - desired_sum);
+                if (Math.abs(temp_dress.getCloValue() + jacket_clo - desired_clo) < diff) {
+                    diff = Math.abs(temp_dress.getCloValue() + jacket_clo - desired_clo);
                     result_jacket_position = jacketCursor.getPosition();
                     best_outfit = temp_dress;
                 }
@@ -254,14 +255,14 @@ public class OutfitLogic {
 
             if (!best_outfit.isEmpty() && jacketCursor.moveToPosition(result_jacket_position)) {
                 byte[] imageByteArray = jacketCursor.getBlob(jacketCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE));
-                double warmth = jacketCursor.getDouble(jacketCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
+                double clo = jacketCursor.getDouble(jacketCursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_CLO_VALUE));
 
                 if (imageByteArray != null && imageByteArray.length > 0)
                 {
                     ByteArrayInputStream imageStream = new ByteArrayInputStream(imageByteArray);
-                    best_outfit.addItem(new ClothingItem(Outfit.OUTER1, BitmapFactory.decodeStream(imageStream), warmth));
+                    best_outfit.addItem(new ClothingItem(Outfit.OUTER1, BitmapFactory.decodeStream(imageStream), clo));
                 } else {
-                    best_outfit.addItem(new ClothingItem(Outfit.OUTER1, null, warmth));
+                    best_outfit.addItem(new ClothingItem(Outfit.OUTER1, null, clo));
                 }
             }
         }

@@ -202,43 +202,23 @@
                     style="@style/EditorUnitsStyle"/>
             </RelativeLayout>
 
-            <!-- Nylon field -->
+            <!-- Nylon/Spandex field -->
             <RelativeLayout
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
                 android:layout_weight="2"
                 android:paddingLeft="4dp">
 
-                <!-- Nylon value field -->
+                <!-- Nylon/Spandex value field -->
                 <EditText
-                    android:id="@+id/edit_item_nylon"
-                    android:hint="@string/hint_item_nylon"
+                    android:id="@+id/edit_item_nylon_spandex"
+                    android:hint="@string/hint_item_nylon_spandex"
                     android:inputType="number"
                     style="@style/EditorFieldStyle" />
 
                 <!-- Units for fabric percentage (%) -->
                 <TextView
-                    android:text="@string/unit_item_nylon"
-                    style="@style/EditorUnitsStyle"/>
-            </RelativeLayout>
-
-            <!-- Spandex field -->
-            <RelativeLayout
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent"
-                android:layout_weight="2"
-                android:paddingLeft="4dp">
-
-                <!-- Spandex value field -->
-                <EditText
-                    android:id="@+id/edit_item_spandex"
-                    android:hint="@string/hint_item_spandex"
-                    android:inputType="number"
-                    style="@style/EditorFieldStyle" />
-
-                <!-- Units for fabric percentage (%) -->
-                <TextView
-                    android:text="@string/unit_item_spandex"
+                    android:text="@string/unit_item_nylon_spandex"
                     style="@style/EditorUnitsStyle"/>
             </RelativeLayout>
 

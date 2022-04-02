@@ -18,7 +18,7 @@ public class OutfitAdapter extends ArrayAdapter<Outfit> {
 
     private Activity mContext;
 
-    private double mDesriedWarmth;
+    private double mDesiredCloValue;
 
     public OutfitAdapter(Activity context, ArrayList<Outfit> input) {
         super(context, 0, input);
@@ -94,7 +94,7 @@ public class OutfitAdapter extends ArrayAdapter<Outfit> {
     }
 
     // TODO: remove, for debugging
-    public void setOptWarmth(double optWarmth) {
-        mDesriedWarmth = optWarmth;
+    public void setDesiredCloValue(double desiredCloValue) {
+        mDesiredCloValue = desiredCloValue;
     }
 }

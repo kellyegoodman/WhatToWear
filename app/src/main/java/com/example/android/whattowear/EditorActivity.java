@@ -69,10 +69,8 @@ public class EditorActivity extends AppCompatActivity implements
     private EditText mPolyesterEditText;
     /** EditText field to enter the item's rayon percentage */
     private EditText mRayonEditText;
-    /** EditText field to enter the item's nylon percentage */
-    private EditText mNylonEditText;
-    /** EditText field to enter the item's spandex percentage */
-    private EditText mSpandexEditText;
+    /** EditText field to enter the item's nylon/spandex percentage */
+    private EditText mNylonSpandexEditText;
     /** EditText field to enter the item's wool percentage */
     private EditText mWoolEditText;
 
@@ -203,8 +201,7 @@ public class EditorActivity extends AppCompatActivity implements
         mCottonEditText = (EditText) findViewById(R.id.edit_item_cotton);
         mPolyesterEditText = (EditText) findViewById(R.id.edit_item_polyester);
         mRayonEditText = (EditText) findViewById(R.id.edit_item_rayon);
-        mNylonEditText = (EditText) findViewById(R.id.edit_item_nylon);
-        mSpandexEditText = (EditText) findViewById(R.id.edit_item_spandex);
+        mNylonSpandexEditText = (EditText) findViewById(R.id.edit_item_nylon_spandex);
         mWoolEditText = (EditText) findViewById(R.id.edit_item_wool);
         mImageButton = (ImageButton) findViewById(R.id.edit_item_image);
 
@@ -217,8 +214,7 @@ public class EditorActivity extends AppCompatActivity implements
         mCottonEditText.setOnTouchListener(mTouchListener);
         mPolyesterEditText.setOnTouchListener(mTouchListener);
         mRayonEditText.setOnTouchListener(mTouchListener);
-        mNylonEditText.setOnTouchListener(mTouchListener);
-        mSpandexEditText.setOnTouchListener(mTouchListener);
+        mNylonSpandexEditText.setOnTouchListener(mTouchListener);
         mWoolEditText.setOnTouchListener(mTouchListener);
         mImageButton.setOnClickListener(new View.OnClickListener() {
 
@@ -392,8 +388,7 @@ public class EditorActivity extends AppCompatActivity implements
         String cottonString = mCottonEditText.getText().toString().trim();
         String polyesterString = mPolyesterEditText.getText().toString().trim();
         String rayonString = mRayonEditText.getText().toString().trim();
-        String nylonString = mNylonEditText.getText().toString().trim();
-        String spandexString = mSpandexEditText.getText().toString().trim();
+        String nylonSpandexString = mNylonSpandexEditText.getText().toString().trim();
         String woolString = mWoolEditText.getText().toString().trim();
 
         // Check if this is supposed to be a new pet
@@ -424,8 +419,7 @@ public class EditorActivity extends AppCompatActivity implements
         int cotton = 0;
         int polyester  = 0;
         int rayon = 0;
-        int nylon = 0;
-        int spandex = 0;
+        int nylon_spandex = 0;
         int wool = 0;
         if (!TextUtils.isEmpty(cottonString)) {
             cotton = Integer.parseInt(cottonString);
@@ -436,11 +430,8 @@ public class EditorActivity extends AppCompatActivity implements
         if (!TextUtils.isEmpty(rayonString)) {
             rayon = Integer.parseInt(rayonString);
         }
-        if (!TextUtils.isEmpty(nylonString)) {
-            nylon = Integer.parseInt(nylonString);
-        }
-        if (!TextUtils.isEmpty(spandexString)) {
-            spandex = Integer.parseInt(spandexString);
+        if (!TextUtils.isEmpty(nylonSpandexString)) {
+            nylon_spandex = Integer.parseInt(nylonSpandexString);
         }
         if (!TextUtils.isEmpty(woolString)) {
             wool = Integer.parseInt(woolString);
@@ -449,8 +440,7 @@ public class EditorActivity extends AppCompatActivity implements
         values.put(ClothesEntry.COLUMN_ARTICLE_COTTON, cotton);
         values.put(ClothesEntry.COLUMN_ARTICLE_POLYESTER, polyester);
         values.put(ClothesEntry.COLUMN_ARTICLE_RAYON, rayon);
-        values.put(ClothesEntry.COLUMN_ARTICLE_NYLON, nylon);
-        values.put(ClothesEntry.COLUMN_ARTICLE_SPANDEX, spandex);
+        values.put(ClothesEntry.COLUMN_ARTICLE_NYLON_SPANDEX, nylon_spandex);
         values.put(ClothesEntry.COLUMN_ARTICLE_WOOL, wool);
 
         // save image as blob
@@ -657,8 +647,7 @@ public class EditorActivity extends AppCompatActivity implements
                 ClothesEntry.COLUMN_ARTICLE_COTTON,
                 ClothesEntry.COLUMN_ARTICLE_POLYESTER,
                 ClothesEntry.COLUMN_ARTICLE_RAYON,
-                ClothesEntry.COLUMN_ARTICLE_NYLON,
-                ClothesEntry.COLUMN_ARTICLE_SPANDEX,
+                ClothesEntry.COLUMN_ARTICLE_NYLON_SPANDEX,
                 ClothesEntry.COLUMN_ARTICLE_WOOL};
         // This loader will execute the ContentProvider's query method on a background thread
         return new CursorLoader(this,   // Parent activity context
@@ -685,8 +674,7 @@ public class EditorActivity extends AppCompatActivity implements
             int cottonColumnIndex = cursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_COTTON);
             int polyesterColumnIndex = cursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_POLYESTER);
             int rayonColumnIndex = cursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_RAYON);
-            int nylonColumnIndex = cursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_NYLON);
-            int spandexColumnIndex = cursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_SPANDEX);
+            int nylonSpandexColumnIndex = cursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_NYLON_SPANDEX);
             int woolColumnIndex = cursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WOOL);
             int imageColumnIndex = cursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE);
             // Extract out the value from the Cursor for the given column index
@@ -696,8 +684,7 @@ public class EditorActivity extends AppCompatActivity implements
             int cotton = cursor.getInt(cottonColumnIndex);
             int polyester = cursor.getInt(polyesterColumnIndex);
             int rayon = cursor.getInt(rayonColumnIndex);
-            int nylon = cursor.getInt(nylonColumnIndex);
-            int spandex = cursor.getInt(spandexColumnIndex);
+            int nylon_spandex = cursor.getInt(nylonSpandexColumnIndex);
             int wool = cursor.getInt(woolColumnIndex);
             int weight = cursor.getInt(weightColumnIndex);
             byte[] imageByteArray=cursor.getBlob(imageColumnIndex);
@@ -708,12 +695,10 @@ public class EditorActivity extends AppCompatActivity implements
             }
 
             // Update the views on the screen with the values from the database
-            mSpandexEditText.setText(ClothesEntry.getSubCategoryName(type));
             mCottonEditText.setText(Integer.toString(cotton));
             mPolyesterEditText.setText(Integer.toString(polyester));
             mRayonEditText.setText(Integer.toString(rayon));
-            mNylonEditText.setText(Integer.toString(nylon));
-            mSpandexEditText.setText(Integer.toString(spandex));
+            mNylonSpandexEditText.setText(Integer.toString(nylon_spandex));
             mWoolEditText.setText(Integer.toString(wool));
             mWeightEditText.setText(Integer.toString(weight));
             mNameEditText.setText(name);
@@ -736,8 +721,7 @@ public class EditorActivity extends AppCompatActivity implements
         mCottonEditText.setText("");
         mPolyesterEditText.setText("");
         mRayonEditText.setText("");
-        mNylonEditText.setText("");
-        mSpandexEditText.setText("");
+        mNylonSpandexEditText.setText("");
         mWoolEditText.setText("");
         mSubCategorySpinner.setSelection(0); // Select "T Shirt" subcategory
         mImageButton.setImageResource(R.drawable.baseline_add_photo_alternate_black_36dp);

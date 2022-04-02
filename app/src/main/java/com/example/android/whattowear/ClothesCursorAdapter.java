@@ -67,7 +67,7 @@ public class ClothesCursorAdapter extends CursorAdapter {
         // get the data from the cursor
         Integer itemSubCategory = cursor.getInt(cursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_SUBCATEGORY));
         String itemName = cursor.getString(cursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_NAME));
-        Double itemWarmth = cursor.getDouble(cursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WARMTH));
+        Double itemCloValue = cursor.getDouble(cursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_CLO_VALUE));
 
         byte[] imageByteArray=cursor.getBlob(cursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_IMAGE));
 
@@ -81,7 +81,7 @@ public class ClothesCursorAdapter extends CursorAdapter {
         subcategoryTextView.setText(ClothesEntry.getSubCategoryName(itemSubCategory));
         nameTextView.setText(itemName);
 
-        double roundOff = (double) Math.round(itemWarmth * 100) / 100;
+        double roundOff = (double) Math.round(itemCloValue * 100) / 100;
         warmthView.setText(Double.toString(roundOff));
 
         if (imageByteArray != null && imageByteArray.length > 0)

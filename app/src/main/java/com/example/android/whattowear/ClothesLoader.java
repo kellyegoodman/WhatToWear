@@ -48,7 +48,7 @@ public class ClothesLoader
                 ClothesEntry.COLUMN_ARTICLE_CATEGORY,
                 ClothesEntry.COLUMN_ARTICLE_SUBCATEGORY,
                 ClothesEntry.COLUMN_ARTICLE_IMAGE,
-                ClothesEntry.COLUMN_ARTICLE_WARMTH};
+                ClothesEntry.COLUMN_ARTICLE_CLO_VALUE};
 
         String selection = ClothesEntry.COLUMN_ARTICLE_SUBCATEGORY + "=?";
         for (int s = 0; s < mSelectionArgs.length - 1; s++) {
@@ -61,7 +61,7 @@ public class ClothesLoader
                 projection,                     // Columns to include in the resulting cursor
                 selection,                   // selection clause
                 mSelectionArgs,                // selection arguments
-                ClothesEntry.COLUMN_ARTICLE_WARMTH);   // sort order
+                ClothesEntry.COLUMN_ARTICLE_CLO_VALUE);   // sort order
     }
 
     @Override

@@ -85,7 +85,7 @@ public final class ClothesContract {
          *
          * Type: INTEGER
          */
-        public final static String COLUMN_ARTICLE_SUBCATEGORY = "subCategory";
+        public final static String COLUMN_ARTICLE_SUBCATEGORY = "sub_category";
 
         /**
          * Name of the item.
@@ -117,16 +117,15 @@ public final class ClothesContract {
         public final static String COLUMN_ARTICLE_COTTON = "cotton";
         public final static String COLUMN_ARTICLE_POLYESTER = "polyester";
         public final static String COLUMN_ARTICLE_RAYON = "rayon";
-        public final static String COLUMN_ARTICLE_NYLON = "nylon";
-        public final static String COLUMN_ARTICLE_SPANDEX = "spandex";
+        public final static String COLUMN_ARTICLE_NYLON_SPANDEX = "nylon_spandex";
         public final static String COLUMN_ARTICLE_WOOL = "wool";
 
         /**
-         * Computed warmth factor of the item.
+         * Computed clo value of the item.
          *
          * Type: REAL
          */
-        public final static String COLUMN_ARTICLE_WARMTH = "warmth";
+        public final static String COLUMN_ARTICLE_CLO_VALUE = "clo_value";
 
         /**
          * Enum of materials
@@ -134,10 +133,9 @@ public final class ClothesContract {
         public static final int COTTON = 0;
         public static final int POLYESTER = 1;
         public static final int RAYON = 2;
-        public static final int NYLON = 3;
-        public static final int SPANDEX = 4;
-        public static final int WOOL = 5;
-        public static final int NUM_MATERIALS = 6;
+        public static final int NYLON_SPANDEX = 3;
+        public static final int WOOL = 4;
+        public static final int NUM_MATERIALS = 5;
 
         /**
          * Possible values for the categories.
@@ -243,41 +241,68 @@ public final class ClothesContract {
         }
 
         /**
-         * Material properties
+         * Material properties of plain, woven fabrics
+         *
+         * Siddiqui, MOR & Sun, D 2018, 'Thermal Analysis of Conventional and Performance Plain Woven Fabrics by
+         * Finite Element Method', Journal of Industrial Textiles, vol. 48, no. 4, pp. 685-712.
+         * https://doi.org/10.1177/1528083717736104
+         * https://pure.hw.ac.uk/ws/portalfiles/portal/15876620/2017_Thermal_Analysis_of_Conventional_and_Performance_Plain_Woven_Fabrics_by_Finite_Element_Method_author_version.pdf
          */
-        private static final double[] densities = {1.5, 1.38, 1.49, 1.15, 1.32, 1.29};
-        private static final double[] thermalConductivity = {0.04, 0.05, 0.06, 0.15, 0.08, 0.20};
+        private static final double[] densities = {1520, 1390, 1490, 1320, 1310};     // kg / m^2
+        private static final double[] thermalConductivity = {0.056, 0.048, 0.048, 0.039, 0.041};   // W / m K
 
-        // warmth factor derivation
-        // density = pi*%i
-        // volume = weight / density
-        // warmth factor = V * ( ki*%i )
+        /**
+         * Estimated surface area of average person is 1.8 m²:
+         * https://www.engineeringtoolbox.com/clo-clothing-thermal-insulation-d_732.html
+         */
+        private static final double surfaceArea = 1.8;  // m^2
+        private static final double fudgeFactor = 20.0;
 
-        public static double getWarmthFactor(ContentValues values) {
+        /**
+         * Calculating Clo value for a clothing item:
+         *
+         * 1 clo = 0.155 m²K/W
+         * thermal conductivity k, units: [W / m K]
+         * thermal resistance (R-value) R = thickness / k, units: [m²K/W]
+         *
+         * 1. compute item density (weighted sum of fabric densities)
+         *
+         * 2. estimate the material thickness?
+         *      volume = weight / density*1000(g/kg)
+         *      thickness = volume / surface_area
+         *
+         * 3. Calculate Clo value
+         *      R-value = thickness / k
+         *      clo = R-value / 0.155 m²K/W (literature states 0.155 m²K/W, here need to use fudge factor of 20)
+          */
+
+        public static double calculateCloValue(ContentValues values) {
             // get materials and weight
             Integer cotton = values.getAsInteger(ClothesEntry.COLUMN_ARTICLE_COTTON);
             Integer polyester = values.getAsInteger(ClothesEntry.COLUMN_ARTICLE_POLYESTER);
             Integer rayon = values.getAsInteger(ClothesEntry.COLUMN_ARTICLE_RAYON);
-            Integer nylon = values.getAsInteger(ClothesEntry.COLUMN_ARTICLE_NYLON);
-            Integer spandex = values.getAsInteger(ClothesEntry.COLUMN_ARTICLE_SPANDEX);
+            Integer spandex = values.getAsInteger(ClothesEntry.COLUMN_ARTICLE_NYLON_SPANDEX);
             Integer wool = values.getAsInteger(ClothesEntry.COLUMN_ARTICLE_WOOL);
 
             double density = (cotton*densities[0] +
                     polyester*densities[1] +
                     rayon*densities[2] +
-                    nylon*densities[3] +
-                    spandex*densities[4] +
-                    wool*densities[5]) / 100;
+                    spandex*densities[3] +
+                    wool*densities[4]) / 100;
 
             Integer weight = values.getAsInteger(ClothesEntry.COLUMN_ARTICLE_WEIGHT);
 
-            double warmth = weight * (cotton*thermalConductivity[0] +
+            double volume = weight / (density * 1000);
+            double thickness = volume / surfaceArea;
+
+            double k = (cotton*thermalConductivity[0] +
                     polyester*thermalConductivity[1] +
                     rayon*thermalConductivity[2] +
-                    nylon*thermalConductivity[3] +
-                    spandex*thermalConductivity[4] +
-                    wool*thermalConductivity[5]) / density;
-            return warmth;
+                    spandex*thermalConductivity[3] +
+                    wool*thermalConductivity[4]) / 100;
+            double clo = (fudgeFactor * thickness) / (k * 0.155);
+
+            return clo;
         }
 
 
@@ -327,8 +352,8 @@ public final class ClothesContract {
          * Returns whether or not the given material percentage is valid.
          */
         public static boolean isValidMaterial(int _cotton, int _polyester, int _rayon,
-                                              int _nylon, int _spandex, int _wool) {
-            if (_cotton + _polyester + _rayon + _nylon + _spandex + _wool == 100) {
+                                              int _spandex, int _wool) {
+            if (_cotton + _polyester + _rayon + _spandex + _wool == 100) {
                 return true;
             }
             return false;

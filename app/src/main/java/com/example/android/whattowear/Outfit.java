@@ -16,17 +16,17 @@ public class Outfit {
     public static class ClothingItem {
         private int mType;
         private Bitmap mBitmap;
-        private double mWarmth;
+        private double mCloValue;
 
-        public ClothingItem(int type, Bitmap image, double warmth) {
+        public ClothingItem(int type, Bitmap image, double clo) {
             mType = type;
             mBitmap = image;
-            mWarmth = warmth;
+            mCloValue = clo;
         }
 
         public int getType() { return mType; }
         public Bitmap getImage() { return mBitmap; }
-        public double getWarmth() { return mWarmth; }
+        public double getCloValue() { return mCloValue; }
     }
 
     private ArrayList<ClothingItem> mClothingList = new ArrayList<>();
@@ -42,12 +42,12 @@ public class Outfit {
         }
     }
 
-    public double getWarmth() {
-        double warmth = 0;
+    public double getCloValue() {
+        double clo = 0;
         for (ClothingItem item : mClothingList) {
-            warmth += item.getWarmth();
+            clo += item.getCloValue();
         }
-        return warmth;
+        return clo;
     }
 
     public boolean isEmpty() { return mClothingList.isEmpty(); }

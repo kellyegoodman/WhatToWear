@@ -126,12 +126,11 @@ public class ClothesProvider extends ContentProvider {
         Integer cotton = values.getAsInteger(ClothesEntry.COLUMN_ARTICLE_COTTON);
         Integer polyester = values.getAsInteger(ClothesEntry.COLUMN_ARTICLE_POLYESTER);
         Integer rayon = values.getAsInteger(ClothesEntry.COLUMN_ARTICLE_RAYON);
-        Integer nylon = values.getAsInteger(ClothesEntry.COLUMN_ARTICLE_NYLON);
-        Integer spandex = values.getAsInteger(ClothesEntry.COLUMN_ARTICLE_SPANDEX);
+        Integer spandex = values.getAsInteger(ClothesEntry.COLUMN_ARTICLE_NYLON_SPANDEX);
         Integer wool = values.getAsInteger(ClothesEntry.COLUMN_ARTICLE_WOOL);
-        if (cotton == null || polyester == null || rayon == null || nylon == null ||
-                spandex == null || wool == null || !ClothesEntry.isValidMaterial(cotton, polyester,
-                rayon, nylon, spandex, wool)) {
+        if (cotton == null || polyester == null || rayon == null || spandex == null ||
+                wool == null || !ClothesEntry.isValidMaterial(cotton, polyester,
+                rayon, spandex, wool)) {
             throw new IllegalArgumentException("Item's fabric percentages do not add up to 100");
         }
 
@@ -141,9 +140,9 @@ public class ClothesProvider extends ContentProvider {
             throw new IllegalArgumentException("Item requires valid weight");
         }
 
-        // compute the warmth
-        double warmth = ClothesEntry.getWarmthFactor(values);
-        values.put(ClothesEntry.COLUMN_ARTICLE_WARMTH, warmth);
+        // compute the clo value
+        double clo = ClothesEntry.calculateCloValue(values);
+        values.put(ClothesEntry.COLUMN_ARTICLE_CLO_VALUE, clo);
 
         // No need to check the name or image file name, any value is valid (including null).
         // TODO: check that image path is valid?
@@ -214,12 +213,11 @@ public class ClothesProvider extends ContentProvider {
         Integer cotton = values.getAsInteger(ClothesEntry.COLUMN_ARTICLE_COTTON);
         Integer polyester = values.getAsInteger(ClothesEntry.COLUMN_ARTICLE_POLYESTER);
         Integer rayon = values.getAsInteger(ClothesEntry.COLUMN_ARTICLE_RAYON);
-        Integer nylon = values.getAsInteger(ClothesEntry.COLUMN_ARTICLE_NYLON);
-        Integer spandex = values.getAsInteger(ClothesEntry.COLUMN_ARTICLE_SPANDEX);
+        Integer spandex = values.getAsInteger(ClothesEntry.COLUMN_ARTICLE_NYLON_SPANDEX);
         Integer wool = values.getAsInteger(ClothesEntry.COLUMN_ARTICLE_WOOL);
-        if (cotton == null || polyester == null || rayon == null || nylon == null ||
-                spandex == null || wool == null || !ClothesEntry.isValidMaterial(cotton, polyester,
-                rayon, nylon, spandex, wool)) {
+        if (cotton == null || polyester == null || rayon == null || spandex == null ||
+                wool == null || !ClothesEntry.isValidMaterial(cotton, polyester,
+                rayon, spandex, wool)) {
             throw new IllegalArgumentException("Item's subcategory must match category");
         }
 
@@ -232,9 +230,9 @@ public class ClothesProvider extends ContentProvider {
             }
         }
 
-        // compute the warmth
-        double warmth = ClothesEntry.getWarmthFactor(values);
-        values.put(ClothesEntry.COLUMN_ARTICLE_WARMTH, warmth);
+        // compute the clo value
+        double clo = ClothesEntry.calculateCloValue(values);
+        values.put(ClothesEntry.COLUMN_ARTICLE_CLO_VALUE, clo);
 
         // No need to check the image file name, any value is valid (including null).
 

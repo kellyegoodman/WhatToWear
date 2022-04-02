@@ -53,7 +53,7 @@ public class OutfitFragment extends Fragment {
 
     private String mTemperatureUnits;
 
-    private double mOptimalOutfitWarmth;
+    private double mDesiredCloValue;
 
     private OutfitLogic m_casualOutfitLogic;
     private OutfitLogic m_formalOutfitLogic;
@@ -65,9 +65,11 @@ public class OutfitFragment extends Fragment {
         return (temp_in_F - 32) * (5.0/9.0);
     }
 
-    private double TempToDesiredWarmth(double temp_in_C) {
-        return 4000 - (100 * temp_in_C);
-    }
+    /**
+     * Desired Clo Value = -0.04*(tempF - 32F) + 2.5
+     *                   = -0.072 * tempC + 2.5
+     */
+    private double TempToDesiredClo(double temp_in_C) { return (-0.072 * temp_in_C) + 2.5; }
 
     // Weather Data callback
     private LoaderManager.LoaderCallbacks<WeatherDay> weatherLoaderListener
@@ -119,16 +121,16 @@ public class OutfitFragment extends Fragment {
             if (weather != null) {
                 // set the desired warmth factor
                 if (mTemperatureUnits.equals(getString(R.string.settings_units_Celsius_value))) {
-                    mOptimalOutfitWarmth = TempToDesiredWarmth(weather.getHighTemperature());
+                    mDesiredCloValue = TempToDesiredClo(weather.getHighTemperature());
                 } else if (mTemperatureUnits.equals(getString(R.string.settings_units_Farenheit_value))) {
-                    mOptimalOutfitWarmth = TempToDesiredWarmth(FarenheitToCelsius(
+                    mDesiredCloValue = TempToDesiredClo(FarenheitToCelsius(
                             weather.getHighTemperature()));
                 }
 
                 // call on outfit logic to display outfits
-                mAdapter.setOptWarmth(mOptimalOutfitWarmth);
-                m_casualOutfitLogic.FetchOutfit(mOptimalOutfitWarmth);
-                m_formalOutfitLogic.FetchOutfit(mOptimalOutfitWarmth);
+                mAdapter.setDesiredCloValue(mDesiredCloValue);
+                m_casualOutfitLogic.FetchOutfit(mDesiredCloValue);
+                m_formalOutfitLogic.FetchOutfit(mDesiredCloValue);
 
                 mEmptyStateTextView.setVisibility(View.GONE);
                 formatWeather(weather);
