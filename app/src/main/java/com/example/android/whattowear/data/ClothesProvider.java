@@ -110,7 +110,7 @@ public class ClothesProvider extends ContentProvider {
     }
 
     /**
-     * Insert a pet into the database with the given content values. Return the new content URI
+     * Insert an item into the database with the given content values. Return the new content URI
      * for that specific row in the database.
      */
     private Uri insertItem(Uri uri, ContentValues values) {
@@ -150,7 +150,7 @@ public class ClothesProvider extends ContentProvider {
         // Get writeable database
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
-        // Insert the new pet with the given values
+        // Insert the new clothing item with the given values
         long id = database.insert(ClothesEntry.TABLE_NAME, null, values);
         // If the ID is -1, then the insertion failed. Log an error and return null.
         if (id == -1) {
@@ -160,7 +160,7 @@ public class ClothesProvider extends ContentProvider {
             // TODO: savepic
         }
 
-        // Notify all listeners that the data has changed for the pet content URI
+        // Notify all listeners that the data has changed for the clothing item content URI
         getContext().getContentResolver().notifyChange(uri, null);
 
         // Once we know the ID of the new row in the table,
@@ -178,7 +178,7 @@ public class ClothesProvider extends ContentProvider {
             case CLOTHES:
                 return updateItem(uri, contentValues, selection, selectionArgs);
             case ARTICLE_ID:
-                // For the PET_ID code, extract out the ID from the URI,
+                // For the ARTICLE_ID code, extract out the ID from the URI,
                 // so we know which row to update. Selection will be "_id=?" and selection
                 // arguments will be a String array containing the actual ID.
                 selection = ClothesEntry._ID + "=?";
@@ -191,7 +191,7 @@ public class ClothesProvider extends ContentProvider {
 
     /**
      * Update items in the database with the given content values. Apply the changes to the rows
-     * specified in the selection and selection arguments (which could be 0 or 1 or more pets).
+     * specified in the selection and selection arguments (which could be 0 or 1 or more clothing items).
      * Return the number of rows that were successfully updated.
      */
     private int updateItem(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
@@ -221,12 +221,12 @@ public class ClothesProvider extends ContentProvider {
             throw new IllegalArgumentException("Item's subcategory must match category");
         }
 
-        // If the {@link PetEntry#COLUMN_PET_WEIGHT} key is present,
+        // If the {@link ClothesEntry#COLUMN_ARTICLE_WEIGHT} key is present,
         // check that the weight value is not negative.
         if (values.containsKey(ClothesEntry.COLUMN_ARTICLE_WEIGHT)) {
             Integer weight = values.getAsInteger(ClothesEntry.COLUMN_ARTICLE_WEIGHT);
             if (weight < 0) {
-                throw new IllegalArgumentException("Pet requires valid weight");
+                throw new IllegalArgumentException("Item requires valid weight");
             }
         }
 
@@ -239,7 +239,7 @@ public class ClothesProvider extends ContentProvider {
         // Get writeable database
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
-        // Notify all listeners that the data has changed for the pet content URI
+        // Notify all listeners that the data has changed for the clothing item content URI
         getContext().getContentResolver().notifyChange(uri, null);
 
         // Perform the update on the database and get the number of rows affected

@@ -46,16 +46,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * Allows user to create a new pet or edit an existing one.
- */
-/**
- * Allows user to create a new pet or edit an existing one.
+ * Allows user to add a new clothing item or edit an existing one.
  */
 public class EditorActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor> {
     /** Identifier for the item data loader */
     private static final int EXISTING_CLOTHING_LOADER = 0;
-    /** Content URI for the existing pet (null if it's a new pet) */
+    /** Content URI for the existing clothing item (null if it's a new item) */
     private Uri mCurrentItemUri;
     /** EditText field to enter the items's subcategory */
     private Spinner mSubCategorySpinner;
@@ -101,7 +98,7 @@ public class EditorActivity extends AppCompatActivity implements
 
     /**
      * OnTouchListener that listens for any user touches on a View, implying that they are modifying
-     * the view, and we change the mPetHasChanged boolean to true.
+     * the view, and we change the mItemHasChanged boolean to true.
      */
     private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
         @Override
@@ -175,17 +172,17 @@ public class EditorActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
         // Examine the intent that was used to launch this activity,
-        // in order to figure out if we're creating a new pet or editing an existing one.
+        // in order to figure out if we're creating a new clothing item or editing an existing one.
         Intent intent = getIntent();
         mCurrentItemUri = intent.getData();
-        // If the intent DOES NOT contain a pet content URI, then we know that we are
-        // creating a new pet.
+        // If the intent DOES NOT contain a clothing item content URI, then we know that we are
+        // creating a new clothing item.
         if (mCurrentItemUri == null) {
             // This is a new item, so change the app bar to say "Add an Item"
             setTitle(getString(R.string.editor_activity_title_new_item));
 
             // Invalidate the options menu, so the "Delete" menu option can be hidden.
-            // (It doesn't make sense to delete a pet that hasn't been created yet.)
+            // (It doesn't make sense to delete a clothing item that hasn't been created yet.)
             invalidateOptionsMenu();
         } else {
             // Otherwise this is an existing item, so change app bar to say "Edit Item"
@@ -321,7 +318,7 @@ public class EditorActivity extends AppCompatActivity implements
     }
 
     /**
-     * Setup the dropdown spinner that allows the user to select the gender of the pet.
+     * Setup the dropdown spinner that allows the user to select the subcategory of the item.
      */
     private void setupSpinner() {
         // Create adapter for spinner. The list options are from the String array it will use
@@ -378,7 +375,7 @@ public class EditorActivity extends AppCompatActivity implements
     }
 
     /**
-     * Get user input from editor and save pet into database.
+     * Get user input from editor and save clothing item into database.
      */
     private void saveItem() {
         // Read from input fields
@@ -391,18 +388,18 @@ public class EditorActivity extends AppCompatActivity implements
         String nylonSpandexString = mNylonSpandexEditText.getText().toString().trim();
         String woolString = mWoolEditText.getText().toString().trim();
 
-        // Check if this is supposed to be a new pet
+        // Check if this is supposed to be a new clothing item
         // and check if all the fields in the editor are blank
         if (mCurrentItemUri == null &&
                 TextUtils.isEmpty(nameString) && TextUtils.isEmpty(weightString) &&
                 TextUtils.isEmpty(cottonString) && TextUtils.isEmpty(polyesterString) &&
                 mSubcategory == ClothesEntry.SUBCATEGORY_TSHIRT) {
-            // Since no fields were modified, we can return early without creating a new pet.
+            // Since no fields were modified, we can return early without creating a new clothing item.
             // No need to create ContentValues and no need to do any ContentProvider operations.
             return;
         }
         // Create a ContentValues object where column names are the keys,
-        // and pet attributes from the editor are the values.
+        // and clothing attributes from the editor are the values.
         ContentValues values = new ContentValues();
         values.put(ClothesEntry.COLUMN_ARTICLE_SUBCATEGORY, mSubcategory);
         values.put(ClothesEntry.COLUMN_ARTICLE_CATEGORY, ClothesEntry.getCategory(mSubcategory));
@@ -449,10 +446,10 @@ public class EditorActivity extends AppCompatActivity implements
         }
         // TODO: better error reporting
 
-        // Determine if this is a new or existing pet by checking if mCurrentPetUri is null or not
+        // Determine if this is a new or existing clothing item by checking if mCurrentItemUri is null or not
         if (mCurrentItemUri == null) {
-            // This is a NEW pet, so insert a new pet into the provider,
-            // returning the content URI for the new pet.
+            // This is a NEW clothing item, so insert a new item into the provider,
+            // returning the content URI for the new clothing item.
             try {
                 Uri newUri = getContentResolver().insert(ClothesEntry.CONTENT_URI, values);
 
@@ -473,9 +470,9 @@ public class EditorActivity extends AppCompatActivity implements
         } else {
             Log.d(LOG_TAG, mCurrentItemUri.toString());
 
-            // Otherwise this is an EXISTING pet, so update the pet with content URI: mCurrentPetUri
+            // Otherwise this is an EXISTING item, so update the item with content URI: mCurrentItemUri
             // and pass in the new ContentValues. Pass in null for the selection and selection args
-            // because mCurrentPetUri will already identify the correct row in the database that
+            // because mCurrentItemUri will already identify the correct row in the database that
             // we want to modify.
             int rowsAffected = getContentResolver().update(mCurrentItemUri, values, null, null);
             // Show a toast message depending on whether or not the update was successful.
@@ -505,7 +502,7 @@ public class EditorActivity extends AppCompatActivity implements
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // User clicked the "Cancel" button, so dismiss the dialog
-                // and continue editing the pet.
+                // and continue editing the clothing item.
                 if (dialog != null) {
                     dialog.dismiss();
                 }
@@ -518,14 +515,14 @@ public class EditorActivity extends AppCompatActivity implements
     }
 
     /**
-     * Perform the deletion of the pet in the database.
+     * Perform the deletion of the clothing item in the database.
      */
     private void deleteItem() {
-        // Only perform the delete if this is an existing pet.
+        // Only perform the delete if this is an existing clothing item.
         if (mCurrentItemUri != null) {
-            // Call the ContentResolver to delete the pet at the given content URI.
-            // Pass in null for the selection and selection args because the mCurrentPetUri
-            // content URI already identifies the pet that we want.
+            // Call the ContentResolver to delete the item at the given content URI.
+            // Pass in null for the selection and selection args because the mCurrentItemUri
+            // content URI already identifies the item that we want.
             int rowsDeleted = getContentResolver().delete(mCurrentItemUri, null, null);
 
             // Show a toast message depending on whether or not the delete was successful.
@@ -555,7 +552,7 @@ public class EditorActivity extends AppCompatActivity implements
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        // If this is a new pet, hide the "Delete" menu item.
+        // If this is a new clothing item, hide the "Delete" menu item.
         if (mCurrentItemUri == null) {
             MenuItem menuItem = menu.findItem(R.id.action_delete);
             menuItem.setVisible(false);
@@ -569,7 +566,7 @@ public class EditorActivity extends AppCompatActivity implements
         switch (item.getItemId()) {
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
-                // Save pet to database
+                // Save item to database
                 saveItem();
                 // Exit activity
                 finish();
@@ -581,7 +578,7 @@ public class EditorActivity extends AppCompatActivity implements
                 return true;
             // Respond to a click on the "Up" arrow button in the app bar
             case android.R.id.home:
-                // If the pet hasn't changed, continue with navigating up to parent activity
+                // If the item hasn't changed, continue with navigating up to parent activity
                 // which is the {@link CatalogActivity}.
                 if (!mItemHasChanged) {
                     NavUtils.navigateUpFromSameTask(EditorActivity.this);
@@ -612,7 +609,7 @@ public class EditorActivity extends AppCompatActivity implements
      */
     @Override
     public void onBackPressed() {
-        // If the pet hasn't changed, continue with handling back button press
+        // If the item hasn't changed, continue with handling back button press
         if (!mItemHasChanged) {
             super.onBackPressed();
             return;
@@ -636,7 +633,7 @@ public class EditorActivity extends AppCompatActivity implements
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         // Since the editor shows all item attributes, define a projection that contains
-        // all columns from the pet table
+        // all columns from the clothes table
         String[] projection = {
                 ClothesEntry._ID,
                 ClothesEntry.COLUMN_ARTICLE_NAME,
@@ -651,7 +648,7 @@ public class EditorActivity extends AppCompatActivity implements
                 ClothesEntry.COLUMN_ARTICLE_WOOL};
         // This loader will execute the ContentProvider's query method on a background thread
         return new CursorLoader(this,   // Parent activity context
-                mCurrentItemUri,         // Query the content URI for the current pet
+                mCurrentItemUri,         // Query the content URI for the current clothing item
                 projection,             // Columns to include in the resulting Cursor
                 null,                   // No selection clause
                 null,                   // No selection arguments
@@ -667,7 +664,7 @@ public class EditorActivity extends AppCompatActivity implements
         // Proceed with moving to the first row of the cursor and reading data from it
         // (This should be the only row in the cursor)
         if (cursor.moveToFirst()) {
-            // Find the columns of pet attributes that we're interested in
+            // Find the columns of item attributes that we're interested in
             int typeColumnIndex = cursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_SUBCATEGORY);
             int nameColumnIndex = cursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_NAME);
             int weightColumnIndex = cursor.getColumnIndex(ClothesEntry.COLUMN_ARTICLE_WEIGHT);
@@ -744,7 +741,7 @@ public class EditorActivity extends AppCompatActivity implements
         builder.setNegativeButton(R.string.keep_editing, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // User clicked the "Keep editing" button, so dismiss the dialog
-                // and continue editing the pet.
+                // and continue editing the item.
                 if (dialog != null) {
                     dialog.dismiss();
                 }

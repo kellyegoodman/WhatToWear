@@ -71,7 +71,7 @@
     <!-- Title for the activity to edit a clothing item [CHAR LIMIT=20] -->
     <string name="editor_activity_title_edit_item">Edit Item</string>
 
-    <!-- Label for editor menu option to save pet and leave editor [CHAR LIMIT=20] -->
+    <!-- Label for editor menu option to save clothing item and leave editor [CHAR LIMIT=20] -->
     <string name="action_save">Save</string>
 
     <!-- Label for editor overflow menu option that deletes the current clothing item [CHAR LIMIT=20] -->
@@ -196,7 +196,7 @@
     <!-- Dialog message to confirm delete of clothing item [CHAR LIMIT=20] -->
     <string name="delete_dialog_msg">Delete Item?</string>
 
-    <!-- Toast message in editor when new pet has failed to be deleted [CHAR LIMIT=NONE] -->
+    <!-- Toast message in editor when new clothing item has failed to be deleted [CHAR LIMIT=NONE] -->
     <string name="editor_delete_item_failed">Error with deleting item</string>
 
     <!-- Toast message in editor when current clothing item was successfully deleted [CHAR LIMIT=NONE] -->

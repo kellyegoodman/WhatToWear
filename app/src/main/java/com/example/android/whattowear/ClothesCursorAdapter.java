@@ -18,7 +18,7 @@ import java.io.ByteArrayInputStream;
 /**
  * {@link ClothesCursorAdapter} is an adapter for a list or grid view
  * that uses a {@link Cursor} of clothing data as its data source. This adapter knows
- * how to create list items for each row of pet data in the {@link Cursor}.
+ * how to create list items for each row of clothing item data in the {@link Cursor}.
  */
 public class ClothesCursorAdapter extends CursorAdapter {
 
@@ -47,8 +47,8 @@ public class ClothesCursorAdapter extends CursorAdapter {
     }
 
     /**
-     * This method binds the pet data (in the current row pointed to by cursor) to the given
-     * list item layout. For example, the name for the current pet can be set on the name TextView
+     * This method binds the clothing data (in the current row pointed to by cursor) to the given
+     * list item layout. For example, the name for the current clothing item can be set on the name TextView
      * in the list item layout.
      *
      * @param view    Existing view, returned earlier by newView() method
@@ -77,7 +77,7 @@ public class ClothesCursorAdapter extends CursorAdapter {
             itemName = context.getString(R.string.no_item_name);
         }
 
-        // Update the TextViews with the attributes for the current pet
+        // Update the TextViews with the attributes for the current clothing item
         subcategoryTextView.setText(ClothesEntry.getSubCategoryName(itemSubCategory));
         nameTextView.setText(itemName);
 

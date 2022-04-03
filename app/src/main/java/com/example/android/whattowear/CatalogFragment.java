@@ -56,31 +56,31 @@ public class CatalogFragment extends Fragment
         });
 
         // Find a reference to the {@link ListView} in the layout
-        ListView petListView = (ListView) rootView.findViewById(R.id.list);
+        ListView clothingItemListView = (ListView) rootView.findViewById(R.id.list);
 
         // Find and set empty view on the ListView, so that it only shows when the list has 0 items.
         View emptyView = rootView.findViewById(R.id.wardrobe_empty_view);
-        petListView.setEmptyView(emptyView);
+        clothingItemListView.setEmptyView(emptyView);
 
-        // Set up an adapter to create a list item for each row of pet data in the cursor.
-        // There is no pet data yet (until the loader finishes) so pass in null for the cursor.
+        // Set up an adapter to create a list item for each row of clothes data in the cursor.
+        // There is no clothing data yet (until the loader finishes) so pass in null for the cursor.
         mCursorAdapter = new ClothesCursorAdapter(getActivity(), null);
-        petListView.setAdapter(mCursorAdapter);
+        clothingItemListView.setAdapter(mCursorAdapter);
 
         // Set up item click listener
-        petListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        clothingItemListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // Create an intent to go to {@link EditorActivity}
                 Intent intent = new Intent(getActivity(), EditorActivity.class);
 
-                // Form the content Uri to represent the pet that was clicked on
+                // Form the content Uri to represent the clothing item that was clicked on
                 Uri contentItemUri = ContentUris.withAppendedId(ClothesEntry.CONTENT_URI, id);
 
-                // Set the intent data with the uri of the pet that was clicked
+                // Set the intent data with the uri of the clothing item that was clicked
                 intent.setData(contentItemUri);
 
-                // Launch the intent (open EditorActivity with the clicked pet data)
+                // Launch the intent (open EditorActivity with the clicked clothing item data)
                 startActivity(intent);
             }
         });
@@ -95,12 +95,12 @@ public class CatalogFragment extends Fragment
     }
 
     /**
-     * Helper method to insert hardcoded pet data into the database. For debugging purposes only.
+     * Helper method to insert hardcoded clothing data into the database. For debugging purposes only.
      */
     private void insertDummyClothing() {
 
         // Create a ContentValues object where column names are the keys,
-        // and Toto's pet attributes are the values.
+        // and the attributes are the values.
         ContentValues values = new ContentValues();
         values.put(ClothesEntry.COLUMN_ARTICLE_CATEGORY, ClothesEntry.CATEGORY_TOP);
         values.put(ClothesEntry.COLUMN_ARTICLE_SUBCATEGORY, ClothesEntry.SUBCATEGORY_TSHIRT);
@@ -113,7 +113,7 @@ public class CatalogFragment extends Fragment
         values.put(ClothesEntry.COLUMN_ARTICLE_WOOL, 0);
 
         // Insert a new row for Toto in the database, returning the ID of that new row.
-        // The first argument for db.insert() is the pets table name.
+        // The first argument for db.insert() is the clothes table name.
         // The second argument provides the name of a column in which the framework
         // can insert NULL in the event that the ContentValues is empty (if
         // this is set to "null", then the framework will not insert a row when
@@ -146,11 +146,11 @@ public class CatalogFragment extends Fragment
     }
 
     /**
-     * Helper method to delete all pets in the database.
+     * Helper method to delete all clothes in the database.
      */
     private void deleteAllItems() {
         int rowsDeleted = getActivity().getContentResolver().delete(ClothesEntry.CONTENT_URI, null, null);
-        Log.v("CatalogActivity", rowsDeleted + " rows deleted from pet database");
+        Log.v("CatalogActivity", rowsDeleted + " rows deleted from clothes database");
     }
 
     @NonNull
@@ -175,7 +175,7 @@ public class CatalogFragment extends Fragment
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
-        // Update {@link PetCursorAdapter} with this new cursor containing updated pet data
+        // Update {@link ClothesCursorAdapter} with this new cursor containing updated clothing item data
         mCursorAdapter.swapCursor(cursor);
     }
 

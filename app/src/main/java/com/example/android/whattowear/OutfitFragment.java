@@ -38,8 +38,6 @@ public class OutfitFragment extends Fragment {
 
     public static final String LOG_TAG = MainActivity.class.getName();
 
-    private ClothesProvider mClothesProvider =  new ClothesProvider();
-
     /**
      * Constant value for the weather loader ID. We can choose any integer.
      * This really only comes into play if you're using multiple loaders.
